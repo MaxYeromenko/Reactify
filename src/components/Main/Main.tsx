@@ -1,3 +1,5 @@
+import classes from "./_Main.module.scss";
+
 export default function Main() {
-    return <></>;
+    return <main className={classes.main}></main>;
 }
