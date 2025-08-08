@@ -24,7 +24,12 @@ export default function Main() {
     // )
     //     .then((res) => res.json())
     //     .then((data) => console.log(data));
-    console.log(getSpotifyToken());
+    async function example() {
+        const token = await getSpotifyToken();
+        console.log(token);
+    }
+
+    example();
 
     return (
         <main className={classes.main}>
