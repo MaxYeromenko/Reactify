@@ -53,7 +53,9 @@ export default function Main() {
                         alt={track.name}
                         width={100}
                     />
-                    <h3>{track.name}</h3>
+                    <h3>
+                        {track.name} {track.url}
+                    </h3>
                     <p>{track.artists.map((a) => a.name).join(", ")}</p>
                     {track.url && (
                         <audio controls src={track.url}>
