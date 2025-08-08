@@ -1,6 +1,6 @@
 import classes from "./_Main.module.scss";
 import getSpotifyToken from "../../ts/GetSpotifyAccessToken";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
 type Artist = {
     name: string;
