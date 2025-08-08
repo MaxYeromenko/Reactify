@@ -20,7 +20,7 @@ type Track = {
     name: string;
     artists: Artist[];
     album: Album;
-    preview_url: string | null;
+    url: string | null;
 };
 
 export default function Main() {
@@ -55,8 +55,8 @@ export default function Main() {
                     />
                     <h3>{track.name}</h3>
                     <p>{track.artists.map((a) => a.name).join(", ")}</p>
-                    {track.preview_url && (
-                        <audio controls src={track.preview_url}>
+                    {track.url && (
+                        <audio controls src={track.url}>
                             Your browser does not support the audio element.
                         </audio>
                     )}

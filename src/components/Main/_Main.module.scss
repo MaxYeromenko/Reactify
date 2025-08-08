@@ -1,5 +1,6 @@
-.main {
+.main>* {
     width: 100%;
     min-height: 80vh;
     background-color: var(--primary-color);
+    line-height: 1;
 }
