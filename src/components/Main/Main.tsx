@@ -1,4 +1,5 @@
 import classes from "./_Main.module.scss";
+import getSpotifyToken from "../../ts/GetSpotifyAccessToken";
 // import { createMusicFetcher } from "../../ts/musicApi";
 
 export default function Main() {
@@ -12,8 +13,7 @@ export default function Main() {
     //     const j = await searchJamendo("Imagine Dragons");
     //     console.log("Jamendo:", j);
     // })();
-    // const token = "8af7e6a0f01d451e99384343267c7f5d";
-
+    // const token = fetch("/api/spotify-token");
     // fetch(
     //     "https://api.spotify.com/v1/search?q=Imagine%20Dragons&type=track&limit=5",
     //     {
@@ -24,6 +24,7 @@ export default function Main() {
     // )
     //     .then((res) => res.json())
     //     .then((data) => console.log(data));
+    console.log(getSpotifyToken());
 
     return (
         <main className={classes.main}>
