@@ -30,7 +30,7 @@ export default function Main() {
         async function getTrack() {
             const token = await getSpotifyToken();
             const res = await fetch(
-                "https://api.spotify.com/v1/search?q=Clonnex&type=track&limit=5",
+                "https://api.spotify.com/v1/search?q=Eminem&type=track&limit=5",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
