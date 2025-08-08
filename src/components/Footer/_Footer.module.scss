@@ -1,1 +1,5 @@
-.footer {}
+@use "/src/scss/patterns" as *;
+
+.footer {
+    @extend %centered-flex;
+}

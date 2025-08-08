@@ -7,6 +7,11 @@
   font-family: "Nata Sans", sans-serif;
   line-height: 0;
   color: var(--text-color);
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+}
+*:focus {
+  outline: 0.15rem solid var(--quaternary-color);
 }
 
 html,
@@ -26,10 +31,6 @@ body button {
   padding: 0.5em;
   border: none;
   color: var(--text-color);
-}
-body input[type=text]:focus,
-body button:focus {
-  outline: 0.15em solid var(--quaternary-color);
 }
 
 :root {

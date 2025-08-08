@@ -1,4 +1,33 @@
+@use "/src/scss/patterns" as *;
+
 .header {
     display: grid;
     grid-template-columns: auto auto auto;
+
+    .container {
+        @extend %centered-flex;
+        justify-content: flex-start;
+        grid-column: 1/2;
+        padding: 5%;
+
+        .logo {
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+            -webkit-text-stroke: 0.025em var(--thirdly-color);
+
+            a {
+                color: var(--quaternary-color);
+            }
+
+            &:hover {
+                -webkit-text-stroke: 0.025em var(--text-color);
+            }
+
+            &:active {
+                a {
+                    color: var(--text-color);
+                }
+            }
+        }
+    }
 }
