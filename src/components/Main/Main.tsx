@@ -20,7 +20,7 @@ type Track = {
     name: string;
     artists: Artist[];
     album: Album;
-    href: string | null;
+    preview_url: string | null;
 };
 
 export default function Main() {
@@ -30,7 +30,7 @@ export default function Main() {
         async function getTrack() {
             const token = await getSpotifyToken();
             const res = await fetch(
-                "https://api.spotify.com/v1/search?q=Imagine%20Dragons&type=track&limit=5",
+                "https://api.spotify.com/v1/search?q=Clonnex&type=track&limit=5",
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -40,7 +40,6 @@ export default function Main() {
             const data = await res.json();
             setTracks(data.tracks.items);
             console.log(data.tracks.items);
-            
         }
 
         getTrack();
@@ -55,12 +54,10 @@ export default function Main() {
                         alt={track.name}
                         width={100}
                     />
-                    <h3>
-                        {track.name} {track.href}
-                    </h3>
+                    <h3>{track.name}</h3>
                     <p>{track.artists.map((a) => a.name).join(", ")}</p>
-                    {track.href && (
-                        <audio controls src={track.href}>
+                    {track.preview_url && (
+                        <audio controls src={track.preview_url}>
                             Your browser does not support the audio element.
                         </audio>
                     )}
