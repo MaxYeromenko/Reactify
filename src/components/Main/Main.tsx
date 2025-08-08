@@ -38,7 +38,9 @@ export default function Main() {
                 }
             );
             const data = await res.json();
-            setTracks(data.tracks.items); // записываем массив треков в состояние
+            setTracks(data.tracks.items);
+            console.log(data.tracks.items);
+            
         }
 
         getTrack();
