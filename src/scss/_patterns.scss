@@ -1,0 +1,15 @@
+$round-edges: 4px;
+
+%centered-flex {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+%rounded-right-edges {
+    border-radius: 0 $round-edges $round-edges 0;
+}
+
+%rounded-left-edges {
+    border-radius: $round-edges 0 0 $round-edges;
+}
