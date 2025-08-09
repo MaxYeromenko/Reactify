@@ -1,6 +1,6 @@
 import Button from "../Button/Button";
 import classes from "./_SearchBar.module.scss";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SearchBar({
     onSearch,
@@ -8,6 +8,27 @@ export default function SearchBar({
     onSearch: (q: string) => void;
 }) {
     const [input, setInput] = useState("");
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (input.trim() === "") {
+            setSuggestions([]);
+            return;
+        }
+
+        const fetchSuggestions = async () => {
+            const res = await fetch(
+                `https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=${encodeURIComponent(
+                    input
+                )}`
+            );
+            const data = await res.json();
+            setSuggestions(data[1]); // массив подсказок
+        };
+
+        const delay = setTimeout(fetchSuggestions, 300); // debounce
+        return () => clearTimeout(delay);
+    }, [input]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -17,16 +38,46 @@ export default function SearchBar({
     }
 
     return (
-        <form className={classes.searchBar} onSubmit={handleSubmit}>
-            <div className={classes.container}>
-                <input
-                    type="text"
-                    className={classes.input}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                />
-                <Button type="submit">Search</Button>
-            </div>
-        </form>
+        <>
+            <form className={classes.searchBar} onSubmit={handleSubmit}>
+                <div className={classes.container}>
+                    <input
+                        type="text"
+                        className={classes.input}
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                    />
+                    <Button type="submit">Search</Button>
+                </div>
+            </form>
+            {suggestions.length > 0 && (
+                <ul
+                    style={{
+                        position: "absolute",
+                        background: "#fff",
+                        listStyle: "none",
+                        padding: "5px",
+                        margin: 0,
+                        border: "1px solid #ccc",
+                        width: "100%",
+                        zIndex: 1000,
+                    }}
+                >
+                    {suggestions.map((s, i) => (
+                        <li
+                            key={i}
+                            onClick={() => {
+                                setInput(s);
+                                onSearch(s);
+                                setSuggestions([]);
+                            }}
+                            style={{ padding: "5px", cursor: "pointer" }}
+                        >
+                            {s}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </>
     );
 }

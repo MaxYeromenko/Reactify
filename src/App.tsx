@@ -9,7 +9,7 @@ export default function App() {
     async function handleSearch(query: string) {
         const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
         const res = await fetch(
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&q=${encodeURIComponent(
                 query
             )}&key=${apiKey}&maxResults=1`
         );
