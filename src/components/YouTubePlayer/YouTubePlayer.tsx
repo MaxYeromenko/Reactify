@@ -1,4 +1,4 @@
-import Button from "../../Button/Button";
+import Button from "../Button/Button";
 import classes from "./_YouTubePlayer.module.scss";
 import { useState, useEffect, useRef } from "react";
 

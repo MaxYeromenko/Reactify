@@ -1,4 +1,4 @@
-import Button from "../../Button/Button";
+import Button from "../Button/Button";
 import classes from "./_SearchBar.module.scss";
 import useInput from "../../hooks/useInput";
 
