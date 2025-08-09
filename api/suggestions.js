@@ -1,17 +1,18 @@
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
     const { q } = req.query;
+
     if (!q) {
-        return res.status(400).json({ error: "Missing query parameter" });
+        res.status(400).json({ error: "Missing query parameter" });
+        return;
     }
 
     try {
         const response = await fetch(
-            `https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=${encodeURIComponent(q as string)}`
+            `https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=${encodeURIComponent(q)}`
         );
 
         const data = await response.json();
+
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.status(200).json({ suggestions: data[1] });
     } catch (err) {
