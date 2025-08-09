@@ -1,0 +1,110 @@
+@use "/src/scss/patterns" as *;
+
+.container {
+    @extend %centered-flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    position: fixed;
+    bottom: 2%;
+    right: 1%;
+    width: 460px;
+    aspect-ratio: 1.75/1;
+    z-index: 10;
+
+    .playerContainer {
+        @extend %centered-flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        width: 100%;
+        height: 100%;
+
+        Button {
+            width: 100%;
+            border-bottom: none;
+        }
+
+        .iframeContainer {
+            @extend %rounded-top-edges;
+            border: 0 solid var(--thirdly-color);
+            border-width: 0.125em 0.125em 0;
+            width: 100%;
+            height: 100%;
+            transition: all 1s ease;
+
+            .iframe {
+                overflow: auto;
+                width: 100%;
+                height: 100%;
+            }
+        }
+
+        .hidden {
+            width: 0;
+            height: 0;
+            opacity: 0;
+
+            &+Button {
+                @extend %rounded-top-edges;
+            }
+        }
+    }
+
+    .controls {
+        @extend %centered-flex;
+        width: 100%;
+
+        Button {
+            width: 100%;
+        }
+
+        Button:first-of-type {
+            border-radius: 0 0 0 $round-edges;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            border: 0.125em solid var(--thirdly-color);
+            border-radius: 0 0 $round-edges 0;
+            height: 100%;
+            background-color: var(--secondary-color);
+            cursor: pointer;
+
+            &::-webkit-slider-runnable-track {
+                height: 8px;
+                background: var(--text-color);
+                border-radius: $round-edges;
+            }
+
+            &::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 15px;
+                height: 15px;
+                background: var(--quaternary-color);
+                border-radius: $round-edges;
+                cursor: pointer;
+                margin-top: -3px;
+            }
+
+            // &::-moz-range-track {
+            //     height: 8px;
+            //     background: aqua;
+            //     border-radius: 4px;
+            // }
+
+            // &::-moz-range-thumb {
+            //     width: 20px;
+            //     height: 20px;
+            //     background: #333;
+            //     border-radius: 50%;
+            //     cursor: pointer;
+            //     border: none;
+            // }
+        }
+    }
+}
+
+.resetAspectRatio {
+    aspect-ratio: unset;
+}

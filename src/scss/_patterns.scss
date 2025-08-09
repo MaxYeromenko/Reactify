@@ -6,6 +6,14 @@ $round-edges: 4px;
     align-items: center;
 }
 
+%rounded-top-edges {
+    border-radius: $round-edges $round-edges 0 0;
+}
+
+%rounded-bottom-edges {
+    border-radius: 0 0 $round-edges $round-edges;
+}
+
 %rounded-right-edges {
     border-radius: 0 $round-edges $round-edges 0;
 }

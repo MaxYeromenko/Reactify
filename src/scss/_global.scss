@@ -8,9 +8,11 @@
     line-height: 0;
     color: var(--text-color);
     transition: all 0.2s ease;
+    outline: none;
 
     &:focus {
-        outline: 0.15rem solid var(--quaternary-color);
+        border-color: var(--quaternary-color) !important;
+        text-decoration-color: var(--quaternary-color) !important;
     }
 }
 
@@ -30,9 +32,10 @@ body {
     }
 
     input[type="text"],
+    input[type="range"],
     button {
         padding: 0.5em;
-        border: none;
+        min-height: 30px;
         color: var(--text-color);
     }
 }

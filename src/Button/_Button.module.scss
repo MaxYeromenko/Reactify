@@ -1,0 +1,19 @@
+.button {
+    background-color: var(--secondary-color);
+    border: 0.125em solid var(--thirdly-color);
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+        color: var(--secondary-color);
+        background-color: var(--text-color);
+
+        i {
+            color: var(--secondary-color);
+        }
+    }
+
+    &:active {
+        background-color: var(--quaternary-color);
+    }
+}

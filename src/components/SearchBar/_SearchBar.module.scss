@@ -6,12 +6,11 @@
 
     .container {
         @extend %centered-flex;
-        gap: 2px;
         width: 100%;
         height: 55%;
 
         .input,
-        .button {
+        Button {
             height: 100%;
             border: 0.125em solid var(--thirdly-color);
         }
@@ -22,21 +21,9 @@
             background-color: var(--primary-color);
         }
 
-        .button {
+        Button {
             @extend %rounded-right-edges;
             flex-grow: 1;
-            background-color: var(--secondary-color);
-            font-weight: 500;
-            cursor: pointer;
-
-            &:hover {
-                color: var(--secondary-color);
-                background-color: var(--text-color);
-            }
-
-            &:active {
-                background-color: var(--quaternary-color);
-            }
         }
     }
 }

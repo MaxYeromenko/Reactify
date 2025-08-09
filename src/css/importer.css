@@ -9,9 +9,11 @@
   color: var(--text-color);
   -webkit-transition: all 0.2s ease;
   transition: all 0.2s ease;
+  outline: none;
 }
 *:focus {
-  outline: 0.15rem solid var(--quaternary-color);
+  border-color: var(--quaternary-color) !important;
+  text-decoration-color: var(--quaternary-color) !important;
 }
 
 html,
@@ -27,9 +29,10 @@ body footer {
   background-color: var(--quinary-color);
 }
 body input[type=text],
+body input[type=range],
 body button {
   padding: 0.5em;
-  border: none;
+  min-height: 30px;
   color: var(--text-color);
 }
 
