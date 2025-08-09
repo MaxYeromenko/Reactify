@@ -11,22 +11,20 @@ export default function SearchBar({
     const [suggestions, setSuggestions] = useState<string[]>([]);
 
     useEffect(() => {
-        if (input.trim() === "") {
+        if (!input.trim()) {
             setSuggestions([]);
             return;
         }
 
         const fetchSuggestions = async () => {
             const res = await fetch(
-                `https://suggestqueries.google.com/complete/search?client=firefox&ds=yt&q=${encodeURIComponent(
-                    input
-                )}`
+                `/api/suggestions?q=${encodeURIComponent(input)}`
             );
             const data = await res.json();
-            setSuggestions(data[1]); // массив подсказок
+            setSuggestions(data.suggestions || []);
         };
 
-        const delay = setTimeout(fetchSuggestions, 300); // debounce
+        const delay = setTimeout(fetchSuggestions, 300);
         return () => clearTimeout(delay);
     }, [input]);
 
