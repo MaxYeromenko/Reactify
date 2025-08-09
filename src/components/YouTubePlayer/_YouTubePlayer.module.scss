@@ -87,20 +87,20 @@
                 margin-top: -3px;
             }
 
-            // &::-moz-range-track {
-            //     height: 8px;
-            //     background: aqua;
-            //     border-radius: 4px;
-            // }
+            &::-moz-range-track {
+                height: 8px;
+                background: var(--text-color);
+                border-radius: $round-edges;
+            }
 
-            // &::-moz-range-thumb {
-            //     width: 20px;
-            //     height: 20px;
-            //     background: #333;
-            //     border-radius: 50%;
-            //     cursor: pointer;
-            //     border: none;
-            // }
+            &::-moz-range-thumb {
+                width: 15px;
+                height: 15px;
+                background: var(--quaternary-color);
+                border-radius: $round-edges;
+                cursor: pointer;
+                margin-top: -3px;
+            }
         }
     }
 }
