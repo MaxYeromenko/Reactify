@@ -1,16 +1,32 @@
 import Button from "../Button/Button";
 import classes from "./_SearchBar.module.scss";
-import useInput from "../../hooks/useInput";
+import { useState } from "react";
 
-export default function SearchBar() {
-    const input = useInput();
+export default function SearchBar({
+    onSearch,
+}: {
+    onSearch: (q: string) => void;
+}) {
+    const [input, setInput] = useState("");
+
+    function handleSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        if (input.trim() !== "") {
+            onSearch(input.trim());
+        }
+    }
 
     return (
-        <div className={classes.searchBar}>
+        <form className={classes.searchBar} onSubmit={handleSubmit}>
             <div className={classes.container}>
-                <input type="text" className={classes.input} {...input} />
-                <Button>Search</Button>
+                <input
+                    type="text"
+                    className={classes.input}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                />
+                <Button type="submit">Search</Button>
             </div>
-        </div>
+        </form>
     );
 }

@@ -9,24 +9,11 @@ declare global {
     }
 }
 
-export default function YouTubePlayer() {
+export default function YouTubePlayer({ videoId }: { videoId: string }) {
     const playerRef = useRef<YT.Player | null>(null);
-    const [videoId] = useState("dQw4w9WgXcQ");
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(10);
     const [hidden, setHidden] = useState(false);
-    // async function searchTrack(query: string) {
-    //     const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-    //     const res = await fetch(
-    //         `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&q=${encodeURIComponent(
-    //             query
-    //         )}&key=${apiKey}&maxResults=2`
-    //     );
-    //     const data = await res.json();
-    //     if (data.items.length > 0) {
-    //         setVideoId(data.items[0].id.videoId);
-    //     }
-    // }
 
     useEffect(() => {
         const tag = document.createElement("script");
