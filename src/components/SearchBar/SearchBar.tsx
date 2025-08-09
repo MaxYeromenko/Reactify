@@ -52,7 +52,7 @@ export default function SearchBar({
                 <ul
                     style={{
                         position: "absolute",
-                        background: "#fff",
+                        // background: "#fff",
                         listStyle: "none",
                         padding: "5px",
                         margin: 0,
