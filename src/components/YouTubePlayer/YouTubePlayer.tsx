@@ -11,11 +11,10 @@ declare global {
 
 export default function YouTubePlayer() {
     const playerRef = useRef<YT.Player | null>(null);
-    const [videoId, setVideoId] = useState("dQw4w9WgXcQ");
+    const [videoId] = useState("dQw4w9WgXcQ");
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(10);
     const [hidden, setHidden] = useState(false);
-
     // async function searchTrack(query: string) {
     //     const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
     //     const res = await fetch(
