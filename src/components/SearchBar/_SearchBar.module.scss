@@ -46,10 +46,11 @@
             border-width: 0 0 0.125em;
             cursor: pointer;
 
-            &:hover{
+            &:hover,
+            &:focus {
                 text-decoration: underline;
             }
-            
+
             &:nth-last-of-type(1) {
                 border-width: 0;
             }
