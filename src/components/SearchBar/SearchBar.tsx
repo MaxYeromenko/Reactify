@@ -8,7 +8,7 @@ export default function SearchBar({
     onSearch: (q: string) => void;
 }) {
     const [input, setInput] = useState("");
-    const [suggestions, setSuggestions] = useState<string[]>([]);
+    let [suggestions, setSuggestions] = useState<string[]>([]);
 
     useEffect(() => {
         if (!input.trim()) {
@@ -47,35 +47,23 @@ export default function SearchBar({
                     />
                     <Button type="submit">Search</Button>
                 </div>
+                {suggestions.length > 0 && (
+                    <ul className={classes.suggestionList}>
+                        {suggestions.map((s, i) => (
+                            <li
+                                key={i}
+                                onClick={() => {
+                                    setInput(s);
+                                    onSearch(s);
+                                    setSuggestions([]);
+                                }}
+                            >
+                                {s}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </form>
-            {suggestions.length > 0 && (
-                <ul
-                    style={{
-                        position: "absolute",
-                        // background: "#fff",
-                        listStyle: "none",
-                        padding: "5px",
-                        margin: 0,
-                        border: "1px solid #ccc",
-                        width: "100%",
-                        zIndex: 1000,
-                    }}
-                >
-                    {suggestions.map((s, i) => (
-                        <li
-                            key={i}
-                            onClick={() => {
-                                setInput(s);
-                                onSearch(s);
-                                setSuggestions([]);
-                            }}
-                            style={{ padding: "5px", cursor: "pointer" }}
-                        >
-                            {s}
-                        </li>
-                    ))}
-                </ul>
-            )}
         </>
     );
 }

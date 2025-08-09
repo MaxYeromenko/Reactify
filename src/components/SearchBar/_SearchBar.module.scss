@@ -2,7 +2,9 @@
 
 .searchBar {
     @extend %centered-flex;
+    flex-direction: column;
     grid-column: 2/3;
+    position: relative;
 
     .container {
         @extend %centered-flex;
@@ -24,6 +26,33 @@
         Button {
             @extend %rounded-right-edges;
             flex-grow: 1;
+        }
+    }
+
+    .suggestionList {
+        @extend %rounded-all-edges;
+        width: 100%;
+        position: absolute;
+        top: 95%;
+        z-index: 2;
+        border: 0.125em solid var(--thirdly-color);
+        background-color: var(--primary-color);
+        list-style: none;
+
+        li {
+            padding: 0.55em 1em;
+            line-height: 1.25;
+            border: 0 solid var(--thirdly-color);
+            border-width: 0 0 0.125em;
+            cursor: pointer;
+
+            &:hover{
+                text-decoration: underline;
+            }
+            
+            &:nth-last-of-type(1) {
+                border-width: 0;
+            }
         }
     }
 }
