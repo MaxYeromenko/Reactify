@@ -47,6 +47,7 @@ export default function SearchBar({
                     />
                     <Button type="submit">Search</Button>
                 </div>
+
                 {suggestions.length > 0 && (
                     <ul className={classes.suggestionList}>
                         {suggestions.map((s, i) => (
