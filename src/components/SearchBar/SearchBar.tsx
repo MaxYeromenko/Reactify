@@ -47,7 +47,7 @@ export default function SearchBar({
                     />
                     <Button type="submit">Search</Button>
                 </div>
-
+                {/* Проблема 1: не прячется окно с подсказками.*/}
                 {suggestions.length > 0 && (
                     <ul className={classes.suggestionList}>
                         {suggestions.map((s, i) => (
@@ -58,7 +58,6 @@ export default function SearchBar({
                                     onSearch(s);
                                     setSuggestions([]);
                                 }}
-                                tabIndex={1}
                             >
                                 {s}
                             </li>
