@@ -57,6 +57,7 @@ export default function SearchBar({
                                     onSearch(s);
                                     setSuggestions([]);
                                 }}
+                                tabIndex={1}
                             >
                                 {s}
                             </li>
