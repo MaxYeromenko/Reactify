@@ -50,7 +50,7 @@
                 text-decoration: underline;
             }
 
-            &:nth-last-of-type(1) {
+            &:last-of-type {
                 border-width: 0;
             }
         }

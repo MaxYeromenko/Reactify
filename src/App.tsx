@@ -21,12 +21,11 @@ export default function App() {
 
         let res = await fetchWithKey(apiKey);
 
-        if (res.status === 403 && apiKeySecond) {
+        if (!res.ok && apiKeySecond) {
             res = await fetchWithKey(apiKeySecond);
         }
 
         if (!res.ok) {
-            console.error("YouTube API error:", res.status, await res.text());
             return;
         }
 

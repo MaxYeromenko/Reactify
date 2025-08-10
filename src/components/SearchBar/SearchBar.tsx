@@ -68,6 +68,7 @@ export default function SearchBar({
                         className={classes.input}
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
+                        placeholder="Search for your favorite tracks..."
                     />
                     <Button type="submit">Search</Button>
                 </div>

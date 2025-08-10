@@ -1,0 +1,43 @@
+@use "/src/scss/patterns" as *;
+
+.input {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 0.125em solid var(--thirdly-color);
+    border-radius: 0 0 $round-edges 0;
+    height: 100%;
+    background-color: var(--secondary-color);
+    cursor: pointer;
+
+    &::-webkit-slider-runnable-track {
+        height: 8px;
+        background: var(--text-color);
+        border-radius: $round-edges;
+    }
+
+    &::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 15px;
+        height: 15px;
+        background: var(--quaternary-color);
+        border-radius: $round-edges;
+        cursor: pointer;
+        margin-top: -3px;
+    }
+
+    &::-moz-range-track {
+        height: 8px;
+        background: var(--text-color);
+        border-radius: $round-edges;
+    }
+
+    &::-moz-range-thumb {
+        width: 15px;
+        height: 15px;
+        background: var(--quaternary-color);
+        border-radius: $round-edges;
+        cursor: pointer;
+        margin-top: -3px;
+    }
+}

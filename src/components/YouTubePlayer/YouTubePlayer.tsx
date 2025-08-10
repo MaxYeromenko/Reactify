@@ -1,4 +1,5 @@
 import Button from "../Button/Button";
+import InputRange from "../InputRange/InputRange";
 import classes from "./_YouTubePlayer.module.scss";
 import { useState, useEffect, useRef } from "react";
 
@@ -9,11 +10,26 @@ declare global {
     }
 }
 
+function formatTime(seconds: number) {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+
+    const hh = h > 0 ? String(h).padStart(2, "0") + ":" : "";
+    const mm = String(m).padStart(2, "0");
+    const ss = String(s).padStart(2, "0");
+
+    return hh + mm + ":" + ss;
+}
+
 export default function YouTubePlayer({ videoId }: { videoId: string }) {
     const playerRef = useRef<YT.Player | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(10);
     const [hidden, setHidden] = useState(false);
+    const [currentTime, setCurrentTime] = useState(0);
+    const [videoLength, setVideoLength] = useState(0);
+    const [isSeeking, setIsSeeking] = useState(false);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -27,14 +43,29 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                     controls: 0,
                     modestbranding: 1,
                     rel: 0,
+                    disablekb: 1,
                 },
                 events: {
-                    onReady: () => playerRef.current?.setVolume(volume),
+                    onReady: () => {
+                        if (playerRef.current) {
+                            playerRef.current.setVolume(volume);
+                            const duration = playerRef.current.getDuration();
+                            if (!isNaN(duration)) setVideoLength(duration);
+                        }
+                    },
                     onStateChange: (event: any) => {
-                        if (event.data === window.YT.PlayerState.PLAYING) {
-                            setIsPlaying(true);
-                        } else {
-                            setIsPlaying(false);
+                        setIsPlaying(
+                            event.data === window.YT.PlayerState.PLAYING
+                        );
+
+                        if (
+                            event.data === window.YT.PlayerState.CUED ||
+                            event.data === window.YT.PlayerState.PLAYING
+                        ) {
+                            const duration = playerRef.current?.getDuration();
+                            if (duration && !isNaN(duration)) {
+                                setVideoLength(duration);
+                            }
                         }
                     },
                 },
@@ -52,6 +83,33 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
             playerRef.current.setVolume(volume);
         }
     }, [videoId]);
+
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout | null = null;
+
+        if (playerRef.current && !isSeeking) {
+            intervalId = setInterval(() => {
+                const time = playerRef.current?.getCurrentTime() || 0;
+                setCurrentTime(time);
+            }, 500);
+        }
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [videoId, isSeeking]);
+
+    function handleSeekChange(e: React.ChangeEvent<HTMLInputElement>) {
+        setCurrentTime(Number(e.target.value));
+        setIsSeeking(true);
+    }
+
+    function handleSeekCommit() {
+        if (playerRef.current) {
+            playerRef.current.seekTo(currentTime, true);
+        }
+        setIsSeeking(false);
+    }
 
     function toggleVideo() {
         if (isPlaying) playerRef.current?.pauseVideo();
@@ -86,6 +144,19 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                     {hidden && <i className="fa-solid fa-chevron-up"></i>}
                     {!hidden && <i className="fa-solid fa-chevron-down"></i>}
                 </Button>
+                <div className={classes.progressBarContainer}>
+                    <span>{formatTime(currentTime)}</span>
+                    <InputRange
+                        type="range"
+                        min={0}
+                        max={videoLength}
+                        value={currentTime}
+                        onChange={handleSeekChange}
+                        onPointerUp={handleSeekCommit}
+                        onTouchEnd={handleSeekCommit}
+                    />
+                    <span>{formatTime(videoLength)}</span>
+                </div>
             </div>
             <div className={classes.controls}>
                 <Button onClick={toggleVideo}>
@@ -106,7 +177,7 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                         <i className="fa-solid fa-volume-high"></i>
                     )}
                 </Button>
-                <input
+                <InputRange
                     type="range"
                     min={0}
                     max={100}

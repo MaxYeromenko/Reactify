@@ -8,7 +8,7 @@
     bottom: 2%;
     right: 1%;
     width: 460px;
-    aspect-ratio: 1.75/1;
+    aspect-ratio: 1.45/1;
     z-index: 1;
 
     .playerContainer {
@@ -20,7 +20,6 @@
 
         Button {
             width: 100%;
-            border-bottom: none;
         }
 
         .iframeContainer {
@@ -35,6 +34,38 @@
                 overflow: auto;
                 width: 100%;
                 height: 100%;
+            }
+        }
+
+        .progressBarContainer {
+            @extend %centered-flex;
+            width: 100%;
+
+            span,
+            input[type="range"] {
+                height: 100%;
+                background-color: var(--secondary-color);
+            }
+
+            span {
+                @extend %centered-flex;
+                flex: 1;
+                border: 0 solid var(--thirdly-color);
+                padding: 1em;
+
+                &:first-of-type {
+                    border-left-width: 0.125em;
+                }
+
+                &:last-of-type {
+                    border-right-width: 0.125em;
+                }
+            }
+
+            input[type="range"] {
+                @extend %rounded-no-edges;
+                flex: 3;
+                border: none;
             }
         }
 
@@ -59,48 +90,6 @@
 
         Button:first-of-type {
             border-radius: 0 0 0 $round-edges;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            border: 0.125em solid var(--thirdly-color);
-            border-radius: 0 0 $round-edges 0;
-            height: 100%;
-            background-color: var(--secondary-color);
-            cursor: pointer;
-
-            &::-webkit-slider-runnable-track {
-                height: 8px;
-                background: var(--text-color);
-                border-radius: $round-edges;
-            }
-
-            &::-webkit-slider-thumb {
-                -webkit-appearance: none;
-                appearance: none;
-                width: 15px;
-                height: 15px;
-                background: var(--quaternary-color);
-                border-radius: $round-edges;
-                cursor: pointer;
-                margin-top: -3px;
-            }
-
-            &::-moz-range-track {
-                height: 8px;
-                background: var(--text-color);
-                border-radius: $round-edges;
-            }
-
-            &::-moz-range-thumb {
-                width: 15px;
-                height: 15px;
-                background: var(--quaternary-color);
-                border-radius: $round-edges;
-                cursor: pointer;
-                margin-top: -3px;
-            }
         }
     }
 }
