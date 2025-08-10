@@ -40,7 +40,8 @@ export default async function handler(req, res) {
             "band",
             "singer",
             "ep",
-            "single"
+            "single",
+            "full"
         ];
 
         const filtered = suggestions.filter(suggestion =>
