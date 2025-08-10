@@ -1,6 +1,6 @@
 import Button from "../Button/Button";
 import classes from "./_SearchBar.module.scss";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 export default function SearchBar({
     onSearch,
@@ -9,6 +9,8 @@ export default function SearchBar({
 }) {
     const [input, setInput] = useState("");
     let [suggestions, setSuggestions] = useState<string[]>([]);
+    const [isFocused, setIsFocused] = useState(false);
+    const containerRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
         if (!input.trim()) {
@@ -28,10 +30,27 @@ export default function SearchBar({
         return () => clearTimeout(delay);
     }, [input]);
 
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(event.target as Node)
+            ) {
+                setSuggestions([]);
+                setIsFocused(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (input.trim() !== "") {
             onSearch(input.trim());
+            setSuggestions([]);
         }
     }
 
@@ -47,7 +66,7 @@ export default function SearchBar({
                     />
                     <Button type="submit">Search</Button>
                 </div>
-                {/* Проблема 1: не прячется окно с подсказками.*/}
+                {/* Проблема 1: не прячется окно с подсказками после нажатия на одну из них.*/}
                 {suggestions.length > 0 && (
                     <ul className={classes.suggestionList}>
                         {suggestions.map((s, i) => (

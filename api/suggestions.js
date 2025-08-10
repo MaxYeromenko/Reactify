@@ -39,7 +39,6 @@ export default async function handler(req, res) {
             "orchestra",
             "band",
             "singer",
-            "album",
             "ep",
             "single"
         ];
