@@ -1,6 +1,8 @@
 export default async function handler(req, res) {
     const { q } = req.query;
     const ytKey = process.env.YOUTUBE_API_KEY;
+    console.log(ytKey);
+    
 
     if (req.method === "OPTIONS") {
         res.setHeader("Access-Control-Allow-Origin", "*");
