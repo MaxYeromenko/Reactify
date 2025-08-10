@@ -12,9 +12,48 @@ export default async function handler(req, res) {
         );
 
         const data = await response.json();
+        const suggestions = data[1];
+
+        const musicKeywords = [
+            "song",
+            "music",
+            "remix",
+            "audio",
+            "live",
+            "cover",
+            "track",
+            "album",
+            "feat",
+            "ft.",
+            "dj",
+            "video",
+            "lyrics",
+            "official",
+            "mp3",
+            "beat",
+            "soundtrack",
+            "radio",
+            "concert",
+            "performance",
+            "mix",
+            "orchestra",
+            "band",
+            "singer",
+            "album",
+            "ep",
+            "single"
+        ];
+
+        const filtered = suggestions.filter(suggestion =>
+            musicKeywords.some(keyword =>
+                suggestion.toLowerCase().includes(keyword)
+            )
+        );
+
+        const finalSuggestions = filtered.length > 0 ? filtered : suggestions;
 
         res.setHeader("Access-Control-Allow-Origin", "*");
-        res.status(200).json({ suggestions: data[1] });
+        res.status(200).json({ suggestions: finalSuggestions });
     } catch (err) {
         res.status(500).json({ error: "Failed to fetch suggestions" });
     }
