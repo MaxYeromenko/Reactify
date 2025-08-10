@@ -118,8 +118,6 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
         playerRef.current?.setVolume(v);
     };
 
-    const toggleVisibility = () => setHidden(!hidden);
-
     return (
         <div
             className={
@@ -136,9 +134,12 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                 >
                     <div id="yt-player" className={classes.iframe}></div>
                 </div>
-                <Button onClick={toggleVisibility}>
-                    {hidden && <i className="fa-solid fa-chevron-up"></i>}
-                    {!hidden && <i className="fa-solid fa-chevron-down"></i>}
+                <Button onClick={() => setHidden(!hidden)}>
+                    {hidden ? (
+                        <i className="fa-solid fa-chevron-up" />
+                    ) : (
+                        <i className="fa-solid fa-chevron-down" />
+                    )}
                 </Button>
                 <div className={classes.progressBarContainer}>
                     <span>{formatTime(currentTime)}</span>
@@ -156,13 +157,15 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
             </div>
             <div className={classes.controls}>
                 <Button onClick={toggleVideo}>
-                    {!isPlaying && <i className="fa-solid fa-play"></i>}
-                    {isPlaying && <i className="fa-solid fa-pause"></i>}
+                    {isPlaying ? (
+                        <i className="fa-solid fa-pause" />
+                    ) : (
+                        <i className="fa-solid fa-play"></i>
+                    )}
                 </Button>
                 <Button
                     onClick={() => {
-                        playerRef.current?.setVolume(0);
-                        changeVolume(0);
+                        changeVolume(volume === 0 ? 10 : 0);
                     }}
                 >
                     {volume === 0 ? (
