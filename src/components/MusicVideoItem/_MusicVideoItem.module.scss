@@ -1,0 +1,71 @@
+@use "/src/scss/patterns" as *;
+
+.musicVideoItem {
+    @extend %centered-flex, %rounded-all-edges;
+    justify-content: flex-start;
+    gap: 10px 25px;
+    padding: 1%;
+    width: 100%;
+    border: 0.125em solid var(--quaternary-color);
+    height: 150px;
+
+    * {
+        line-height: 1.25;
+    }
+
+    .thumbnailContainer {
+        @extend %centered-flex, %rounded-all-edges;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        border: 0.125em solid var(--quaternary-color);
+
+        .thumbnail {
+            @extend %centered-flex;
+            width: 200px;
+            height: 100%
+        }
+
+        .duration {
+            @extend %centered-flex;
+            padding: 1%;
+            width: fit-content;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            border-radius: $round-edges 0 0 0;
+            background-color: var(--quaternary-color);
+        }
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 0 solid var(--quaternary-color);
+        border-left-width: 0.125em;
+        padding: 1%;
+        height: 100%;
+
+        .title {
+            cursor: pointer;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+
+        .meta {
+            @extend %centered-flex;
+            justify-content: flex-start;
+            gap: 10px;
+
+            span {
+                @extend %rounded-all-edges;
+                min-width: fit-content;
+                padding: 5px;
+                background-color: var(--quinary-color);
+            }
+        }
+    }
+}

@@ -14,22 +14,29 @@ function formatTime(seconds: number) {
     const h = Math.floor(seconds / 3600);
     const m = Math.floor((seconds % 3600) / 60);
     const s = Math.floor(seconds % 60);
-
-    const hh = h > 0 ? String(h).padStart(2, "0") + ":" : "";
-    const mm = String(m).padStart(2, "0");
-    const ss = String(s).padStart(2, "0");
-
-    return hh + mm + ":" + ss;
+    const hh = h > 0 ? `${String(h).padStart(2, "0")}:` : "";
+    return `${hh}${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
 export default function YouTubePlayer({ videoId }: { videoId: string }) {
+    const STORAGE_KEY = `yt-player-state-${videoId}`;
     const playerRef = useRef<YT.Player | null>(null);
+
     const [isPlaying, setIsPlaying] = useState(false);
-    const [volume, setVolume] = useState(10);
     const [hidden, setHidden] = useState(false);
-    const [currentTime, setCurrentTime] = useState(0);
-    const [videoLength, setVideoLength] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
+
+    const [volume, setVolume] = useState(() => {
+        const saved = localStorage.getItem(`${STORAGE_KEY}-volume`);
+        return saved !== null ? Number(saved) : 10;
+    });
+
+    const [currentTime, setCurrentTime] = useState(() => {
+        const saved = localStorage.getItem(`${STORAGE_KEY}-time`);
+        return saved !== null ? Number(saved) : 0;
+    });
+
+    const [videoLength, setVideoLength] = useState(0);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -44,13 +51,18 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                     modestbranding: 1,
                     rel: 0,
                     disablekb: 1,
+                    start: currentTime,
+                    autoplay: 0,
                 },
                 events: {
                     onReady: () => {
-                        if (playerRef.current) {
-                            playerRef.current.setVolume(volume);
-                            const duration = playerRef.current.getDuration();
-                            if (!isNaN(duration)) setVideoLength(duration);
+                        if (!playerRef.current) return;
+                        playerRef.current.setVolume(volume);
+                        const duration = playerRef.current.getDuration();
+                        if (!isNaN(duration)) setVideoLength(duration);
+
+                        if (currentTime > 0) {
+                            playerRef.current.seekTo(currentTime, true);
                         }
                     },
                     onStateChange: (event: any) => {
@@ -75,18 +87,10 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
         return () => {
             playerRef.current?.destroy();
         };
-    }, []);
-
-    useEffect(() => {
-        if (playerRef.current) {
-            playerRef.current.loadVideoById(videoId);
-            playerRef.current.setVolume(volume);
-        }
     }, [videoId]);
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout | null = null;
-
         if (playerRef.current && !isSeeking) {
             intervalId = setInterval(() => {
                 const time = playerRef.current?.getCurrentTime() || 0;
@@ -97,7 +101,17 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
         return () => {
             if (intervalId) clearInterval(intervalId);
         };
-    }, [videoId, isSeeking]);
+    }, [isSeeking]);
+
+    useEffect(() => {
+        if (!isSeeking) {
+            localStorage.setItem(`${STORAGE_KEY}-time`, currentTime.toString());
+        }
+    }, [currentTime, isSeeking]);
+
+    useEffect(() => {
+        localStorage.setItem(`${STORAGE_KEY}-volume`, volume.toString());
+    }, [volume]);
 
     function handleSeekChange(e: React.ChangeEvent<HTMLInputElement>) {
         setCurrentTime(Number(e.target.value));
@@ -112,17 +126,15 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
     }
 
     function toggleVideo() {
-        if (isPlaying) playerRef.current?.pauseVideo();
-        else playerRef.current?.playVideo();
-        setIsPlaying(!isPlaying);
+        if (!playerRef.current) return;
+        if (isPlaying) playerRef.current.pauseVideo();
+        else playerRef.current.playVideo();
     }
 
     const changeVolume = (v: number) => {
         setVolume(v);
         playerRef.current?.setVolume(v);
     };
-
-    const toggleVisibility = () => setHidden(!hidden);
 
     return (
         <div
@@ -140,9 +152,12 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
                 >
                     <div id="yt-player" className={classes.iframe}></div>
                 </div>
-                <Button onClick={toggleVisibility}>
-                    {hidden && <i className="fa-solid fa-chevron-up"></i>}
-                    {!hidden && <i className="fa-solid fa-chevron-down"></i>}
+                <Button onClick={() => setHidden(!hidden)}>
+                    {hidden ? (
+                        <i className="fa-solid fa-chevron-up"></i>
+                    ) : (
+                        <i className="fa-solid fa-chevron-down"></i>
+                    )}
                 </Button>
                 <div className={classes.progressBarContainer}>
                     <span>{formatTime(currentTime)}</span>
@@ -160,13 +175,15 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
             </div>
             <div className={classes.controls}>
                 <Button onClick={toggleVideo}>
-                    {!isPlaying && <i className="fa-solid fa-play"></i>}
-                    {isPlaying && <i className="fa-solid fa-pause"></i>}
+                    {!isPlaying ? (
+                        <i className="fa-solid fa-play"></i>
+                    ) : (
+                        <i className="fa-solid fa-pause"></i>
+                    )}
                 </Button>
                 <Button
                     onClick={() => {
-                        playerRef.current?.setVolume(0);
-                        changeVolume(0);
+                        changeVolume(volume === 0 ? 50 : 0);
                     }}
                 >
                     {volume === 0 ? (

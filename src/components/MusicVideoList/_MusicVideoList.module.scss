@@ -1,0 +1,9 @@
+@use "/src/scss/patterns" as *;
+
+.musicVideoList {
+    @extend %centered-flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 1%;
+}
