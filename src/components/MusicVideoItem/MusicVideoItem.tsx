@@ -2,7 +2,7 @@ import classes from "./_MusicVideoItem.module.scss";
 import type { VideoProps } from "../MusicVideoList/MusicVideoList";
 
 export default function MusicVideoItem({
-    id,
+    // id,
     title,
     channelTitle,
     thumbnailUrl,
