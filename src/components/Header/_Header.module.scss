@@ -19,8 +19,9 @@
                 color: var(--quaternary-color);
             }
 
-            &:hover {
-                -webkit-text-stroke: 0.025em var(--text-color);
+            &:hover,
+            &:focus {
+                filter: drop-shadow(0 0 5px var(--quaternary-color));
             }
 
             &:active {

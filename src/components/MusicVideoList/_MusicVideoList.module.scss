@@ -1,9 +1,27 @@
 @use "/src/scss/patterns" as *;
 
-.musicVideoList {
+.musicVideoList,
+.playlistList {
     @extend %centered-flex;
     align-items: flex-start;
     flex-direction: column;
     gap: 10px;
     padding: 1%;
+}
+
+.divider {
+    @extend %centered-flex, %rounded-all-edges;
+    margin: 1.5em;
+    border: 0.125em*2 solid var(--thirdly-color);
+    height: 0;
+
+    h1 {
+        @extend %rounded-all-edges;
+        padding: 0.25em 0.5em;
+        font-size: 1.5em;
+        color: var(--text-color);
+        background-color: var(--quaternary-color);
+        line-height: normal;
+        cursor: default;
+    }
 }

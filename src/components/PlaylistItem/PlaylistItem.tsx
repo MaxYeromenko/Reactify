@@ -1,25 +1,23 @@
 import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
-import type { VideoProps } from "../MusicVideoList/MusicVideoList";
+import type { PlaylistsProps } from "../MusicVideoList/MusicVideoList";
 
 export default function MusicVideoItem({
     title,
     channelTitle,
     thumbnailUrl,
-    duration,
+    itemCount,
     publishedAt,
-    viewCount,
-    likeCount,
-}: VideoProps) {
+}: PlaylistsProps) {
     return (
-        <div className={generalClasses.musicVideoItem}>
+        <div className={generalClasses.playlistItem}>
             <div className={generalClasses.thumbnailContainer}>
                 <img
                     src={thumbnailUrl}
                     alt={title}
                     className={generalClasses.thumbnail}
                 />
-                {duration && (
-                    <span className={generalClasses.duration}>{duration}</span>
+                {itemCount && (
+                    <span className={generalClasses.itemCount}>{itemCount} videos</span>
                 )}
             </div>
             <div className={generalClasses.info}>
@@ -28,15 +26,9 @@ export default function MusicVideoItem({
                 <div className={generalClasses.meta}>
                     <div>
                         <span>Published: {publishedAt}</span>
-                        {viewCount !== undefined && (
-                            <span>Views: {viewCount.toLocaleString()}</span>
-                        )}
-                        {likeCount !== undefined && (
-                            <span>Likes: {likeCount.toLocaleString()}</span>
-                        )}
                     </div>
                     <div>
-                        <span className={generalClasses.type}>Video</span>
+                        <span className={generalClasses.type}>Playlist</span>
                     </div>
                 </div>
             </div>
