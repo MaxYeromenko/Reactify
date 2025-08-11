@@ -26,13 +26,15 @@ export default function MusicVideoItem({
                 <h3 className={classes.title}>{title}</h3>
                 <p className={classes.channel}>{channelTitle}</p>
                 <div className={classes.meta}>
-                    <span>Published: {publishedAt}</span>
-                    {viewCount !== undefined && (
-                        <span>Views: {viewCount.toLocaleString()}</span>
-                    )}
-                    {likeCount !== undefined && (
-                        <span>Likes: {likeCount.toLocaleString()}</span>
-                    )}
+                    <div>
+                        <span>Published: {publishedAt}</span>
+                        {viewCount !== undefined && (
+                            <span>Views: {viewCount.toLocaleString()}</span>
+                        )}
+                        {likeCount !== undefined && (
+                            <span>Likes: {likeCount.toLocaleString()}</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

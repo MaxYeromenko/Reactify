@@ -39,13 +39,14 @@
     }
 
     .info {
+        padding: 1%;
+        height: 100%;
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         border: 0 solid var(--quaternary-color);
         border-left-width: 0.125em;
-        padding: 1%;
-        height: 100%;
 
         .title {
             cursor: pointer;
@@ -57,14 +58,22 @@
 
         .meta {
             @extend %centered-flex;
+            flex-wrap: wrap;
             justify-content: flex-start;
             gap: 10px;
 
-            span {
-                @extend %rounded-all-edges;
-                min-width: fit-content;
-                padding: 5px;
-                background-color: var(--quinary-color);
+            div {
+                @extend %centered-flex;
+                flex-wrap: wrap;
+                justify-content: flex-start;
+                gap: 10px;
+
+                span {
+                    @extend %rounded-all-edges;
+                    min-width: fit-content;
+                    padding: 5px;
+                    background-color: var(--quinary-color);
+                }
             }
         }
     }
