@@ -33,6 +33,8 @@ type CachedPlaylist = {
     timestamp: number;
 };
 
+type MediaType = "video" | "playlist";
+
 const TTL = 6 * 60 * 60 * 1000;
 
 function formatDuration(isoDuration: string) {
@@ -62,10 +64,18 @@ export default function MusicVideoList() {
     const apiKeyFirst = import.meta.env.VITE_YOUTUBE_API_KEY;
     const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
 
-    async function fetchVideosByIds(ids: string[], apiKey: string) {
-        const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${ids.join(
-            ","
-        )}&key=${apiKey}`;
+    async function fetchMediaByIds(
+        ids: string[],
+        apiKey: string,
+        type: MediaType
+    ) {
+        const URL_PATTERN = "https://www.googleapis.com/youtube/v3/";
+        const url =
+            type === "video"
+                ? `${URL_PATTERN}videos?part=snippet,
+                contentDetails,statistics&id=${ids.join(",")}&key=${apiKey}`
+                : `${URL_PATTERN}playlists?part=snippet,
+                contentDetails&id=${ids.join(",")}&key=${apiKey}`;
 
         const res = await fetch(url);
         if (!res.ok) {
@@ -75,154 +85,120 @@ export default function MusicVideoList() {
     }
 
     useEffect(() => {
-        const savedCache = localStorage.getItem(CACHE_KEY);
-        if (savedCache) {
-            try {
-                videosCacheRef.current = JSON.parse(savedCache);
-            } catch {
-                videosCacheRef.current = {};
-            }
-        }
-    }, []);
+        const caches = [
+            { key: CACHE_KEY, ref: videosCacheRef },
+            { key: CACHE_KEY + "_playlists", ref: playlistsCacheRef },
+        ];
 
-    useEffect(() => {
-        async function fetchVideos() {
-            const ids = ["M7lc1UVf-VE", "dQw4w9WgXcQ", "kxopViU98Xo"];
-            const now = Date.now();
-            const idsToFetch = ids.filter(
-                (id) =>
-                    !videosCacheRef.current[id] ||
-                    now - videosCacheRef.current[id].timestamp > TTL
-            );
-
-            if (idsToFetch.length > 0) {
-                let data;
+        caches.forEach(({ key, ref }) => {
+            const savedCache = localStorage.getItem(key);
+            if (savedCache) {
                 try {
-                    data = await fetchVideosByIds(idsToFetch, apiKeyFirst);
+                    ref.current = JSON.parse(savedCache);
                 } catch {
-                    try {
-                        data = await fetchVideosByIds(idsToFetch, apiKeySecond);
-                    } catch {
-                        return;
-                    }
+                    ref.current = {};
                 }
-
-                data.items.forEach((item: any) => {
-                    videosCacheRef.current[item.id] = {
-                        data: {
-                            id: item.id,
-                            title: item.snippet.title,
-                            channelTitle: item.snippet.channelTitle,
-                            thumbnailUrl: item.snippet.thumbnails.medium.url,
-                            duration: formatDuration(
-                                item.contentDetails.duration
-                            ),
-                            publishedAt: new Date(
-                                item.snippet.publishedAt
-                            ).toLocaleDateString(),
-                            viewCount: Number(item.statistics.viewCount),
-                            likeCount: Number(item.statistics.likeCount),
-                        },
-                        timestamp: now,
-                    };
-                });
-                localStorage.setItem(
-                    CACHE_KEY,
-                    JSON.stringify(videosCacheRef.current)
-                );
             }
-
-            setVideos(
-                ids
-                    .map((id) => videosCacheRef.current[id]?.data)
-                    .filter(Boolean)
-            );
-        }
-
-        fetchVideos();
+        });
     }, []);
 
-    async function fetchPlaylistsByIds(ids: string[], apiKey: string) {
-        const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet,contentDetails&id=${ids.join(
-            ","
-        )}&key=${apiKey}`;
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`API error: ${res.status} ${res.statusText}`);
+    async function fetchAndCache({
+        ids,
+        cacheRef,
+        cacheKey,
+        type,
+        parseItem,
+    }: {
+        ids: string[];
+        cacheRef: React.RefObject<Record<string, any>>;
+        cacheKey: string;
+        type: MediaType;
+        parseItem: (item: any) => any;
+    }) {
+        const now = Date.now();
+        const idsToFetch = ids.filter(
+            (id) =>
+                !cacheRef.current[id] ||
+                now - cacheRef.current[id].timestamp > TTL
+        );
+
+        if (idsToFetch.length > 0) {
+            let data;
+            try {
+                data = await fetchMediaByIds(idsToFetch, apiKeyFirst, type);
+            } catch {
+                try {
+                    data = await fetchMediaByIds(
+                        idsToFetch,
+                        apiKeySecond,
+                        type
+                    );
+                } catch {
+                    return [];
+                }
+            }
+
+            data.items.forEach((item: any) => {
+                cacheRef.current[item.id] = {
+                    data: parseItem(item),
+                    timestamp: now,
+                };
+            });
+
+            localStorage.setItem(cacheKey, JSON.stringify(cacheRef.current));
         }
-        return res.json();
+
+        return ids.map((id) => cacheRef.current[id]?.data).filter(Boolean);
     }
 
     useEffect(() => {
-        async function fetchPlaylists() {
-            const ids = [
-                "PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj",
-                "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI",
-            ];
-            const now = Date.now();
+        const videoIds = ["M7lc1UVf-VE", "dQw4w9WgXcQ", "kxopViU98Xo"];
+        const playlistIds = [
+            "PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj",
+            "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI",
+        ];
+        async function init() {
+            const videosList = await fetchAndCache({
+                ids: videoIds,
+                cacheRef: videosCacheRef,
+                cacheKey: CACHE_KEY,
+                type: "video",
+                parseItem: (item) => ({
+                    id: item.id,
+                    title: item.snippet.title,
+                    channelTitle: item.snippet.channelTitle,
+                    thumbnailUrl: item.snippet.thumbnails.medium.url,
+                    duration: formatDuration(item.contentDetails.duration),
+                    publishedAt: new Date(
+                        item.snippet.publishedAt
+                    ).toLocaleDateString(),
+                    viewCount: Number(item.statistics.viewCount),
+                    likeCount: Number(item.statistics.likeCount),
+                }),
+            });
 
-            const idsToFetch = ids.filter(
-                (id) =>
-                    !playlistsCacheRef.current[id] ||
-                    now - playlistsCacheRef.current[id].timestamp > TTL
-            );
+            const playlistsList = await fetchAndCache({
+                ids: playlistIds,
+                cacheRef: playlistsCacheRef,
+                cacheKey: CACHE_KEY + "_playlists",
+                type: "playlist",
+                parseItem: (item) => ({
+                    id: item.id,
+                    title: item.snippet.title,
+                    channelTitle: item.snippet.channelTitle,
+                    thumbnailUrl: item.snippet.thumbnails.medium.url,
+                    publishedAt: new Date(
+                        item.snippet.publishedAt
+                    ).toLocaleDateString(),
+                    itemCount: item.contentDetails.itemCount,
+                }),
+            });
 
-            if (idsToFetch.length > 0) {
-                let data;
-                try {
-                    data = await fetchPlaylistsByIds(idsToFetch, apiKeyFirst);
-                } catch {
-                    try {
-                        data = await fetchPlaylistsByIds(
-                            idsToFetch,
-                            apiKeySecond
-                        );
-                    } catch {
-                        return;
-                    }
-                }
-
-                data.items.forEach((item: any) => {
-                    playlistsCacheRef.current[item.id] = {
-                        data: {
-                            id: item.id,
-                            title: item.snippet.title,
-                            channelTitle: item.snippet.channelTitle,
-                            thumbnailUrl: item.snippet.thumbnails.medium.url,
-                            publishedAt: new Date(
-                                item.snippet.publishedAt
-                            ).toLocaleDateString(),
-                            itemCount: item.contentDetails.itemCount,
-                        },
-                        timestamp: now,
-                    };
-                });
-
-                localStorage.setItem(
-                    CACHE_KEY + "_playlists",
-                    JSON.stringify(playlistsCacheRef.current)
-                );
-            }
-
-            setPlaylists(
-                ids
-                    .map((id) => playlistsCacheRef.current[id]?.data)
-                    .filter(Boolean)
-            );
+            setVideos(videosList ?? []);
+            setPlaylists(playlistsList ?? []);
         }
 
-        fetchPlaylists();
-    }, []);
-
-    useEffect(() => {
-        const savedCache = localStorage.getItem(CACHE_KEY + "_playlists");
-        if (savedCache) {
-            try {
-                playlistsCacheRef.current = JSON.parse(savedCache);
-            } catch {
-                playlistsCacheRef.current = {};
-            }
-        }
+        init();
     }, []);
 
     return (
