@@ -1,10 +1,16 @@
 import Header from "./components/Header/Header";
 import Main from "./components/Main/Main";
 import Footer from "./components/Footer/Footer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function App() {
     const [videoId, setVideoId] = useState("dQw4w9WgXcQ");
+    const [region, setRegion] = useState(() => {
+        return localStorage.getItem("region") || "UA";
+    });
+    const [language, setLanguage] = useState(() => {
+        return localStorage.getItem("language") || "музика";
+    });
 
     async function handleSearch(query: string) {
         const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
@@ -35,10 +41,25 @@ export default function App() {
         }
     }
 
+    useEffect(() => {
+        localStorage.setItem("region", region);
+        localStorage.removeItem("youtubeVideoCache");
+        localStorage.removeItem("youtubeVideoCache_playlists");
+    }, [region]);
+
+    useEffect(() => {
+        localStorage.setItem("language", language);
+    }, [language]);
+
     return (
         <>
-            <Header onSearch={handleSearch} />
-            <Main videoId={videoId} />
+            <Header
+                onSearch={handleSearch}
+                region={region}
+                setRegion={setRegion}
+                setLanguage={setLanguage}
+            />
+            <Main videoId={videoId} region={region} language={language} />
             <Footer />
         </>
     );

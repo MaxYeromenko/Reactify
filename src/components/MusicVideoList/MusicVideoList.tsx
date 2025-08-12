@@ -52,8 +52,15 @@ function formatDuration(isoDuration: string) {
         .join(":");
 }
 
-export default function MusicVideoList() {
+export default function MusicVideoList({
+    region,
+    language,
+}: {
+    region: string;
+    language: string;
+}) {
     const CACHE_KEY = "youtubeVideoCache";
+    const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
 
     const [videos, setVideos] = useState<VideoProps[]>([]);
     const videosCacheRef = useRef<Record<string, CachedVideo>>({});
@@ -64,30 +71,70 @@ export default function MusicVideoList() {
     const apiKeyFirst = import.meta.env.VITE_YOUTUBE_API_KEY;
     const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
 
-    async function fetchMediaByIds(
-        ids: string[],
-        apiKey: string,
-        type: MediaType
-    ) {
+    async function fetchWithFallback(urlFirst: string, urlSecond: string) {
+        for (const url of [urlFirst, urlSecond]) {
+            try {
+                const res = await fetch(url);
+                if (res.ok) return await res.json();
+            } catch {}
+        }
+        return null;
+    }
+
+    async function fetchMediaByIds(ids: string[], type: MediaType) {
         const URL_PATTERN = "https://www.googleapis.com/youtube/v3/";
-        const url =
+        const makeUrl = (apiKey: string) =>
             type === "video"
                 ? `${URL_PATTERN}videos?part=snippet,
                 contentDetails,statistics&id=${ids.join(",")}&key=${apiKey}`
                 : `${URL_PATTERN}playlists?part=snippet,
                 contentDetails&id=${ids.join(",")}&key=${apiKey}`;
+        const data = await fetchWithFallback(
+            makeUrl(apiKeyFirst),
+            makeUrl(apiKeySecond)
+        );
+        return data ?? { items: [] };
+    }
 
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`API error: ${res.status} ${res.statusText}`);
+    async function fetchRecommendedIds(type: MediaType) {
+        const makeUrl = (apiKey: string) =>
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}
+        &maxResults=10&regionCode=${region}&q=${language}&key=${apiKey}`;
+
+        const data = await fetchWithFallback(
+            makeUrl(apiKeyFirst),
+            makeUrl(apiKeySecond)
+        );
+        if (!data || !data.items) return [];
+
+        let ids = data.items
+            .map((item: any) =>
+                type === "video" ? item.id.videoId : item.id.playlistId
+            )
+            .filter(Boolean);
+        if (type === "video" && ids.length) {
+            const details = await fetchMediaByIds(ids, "video");
+            ids = details.items
+                .filter((item: any) => {
+                    const match =
+                        item.contentDetails.duration.match(/PT(\d+M)?(\d+S)?/);
+                    const minutes = match?.[1] ? parseInt(match[1]) : 0;
+                    const seconds = match?.[2] ? parseInt(match[2]) : 0;
+                    return (
+                        minutes > 1 ||
+                        (minutes === 1 && seconds > 0) ||
+                        seconds > 60
+                    );
+                })
+                .map((item: any) => item.id);
         }
-        return res.json();
+        return ids;
     }
 
     useEffect(() => {
         const caches = [
             { key: CACHE_KEY, ref: videosCacheRef },
-            { key: CACHE_KEY + "_playlists", ref: playlistsCacheRef },
+            { key: CACHE_KEY_PLAYLIST, ref: playlistsCacheRef },
         ];
 
         caches.forEach(({ key, ref }) => {
@@ -121,43 +168,23 @@ export default function MusicVideoList() {
                 !cacheRef.current[id] ||
                 now - cacheRef.current[id].timestamp > TTL
         );
-
         if (idsToFetch.length > 0) {
-            let data;
-            try {
-                data = await fetchMediaByIds(idsToFetch, apiKeyFirst, type);
-            } catch {
-                try {
-                    data = await fetchMediaByIds(
-                        idsToFetch,
-                        apiKeySecond,
-                        type
-                    );
-                } catch {
-                    return [];
-                }
-            }
-
+            let data = await fetchMediaByIds(idsToFetch, type);
             data.items.forEach((item: any) => {
                 cacheRef.current[item.id] = {
                     data: parseItem(item),
                     timestamp: now,
                 };
             });
-
             localStorage.setItem(cacheKey, JSON.stringify(cacheRef.current));
         }
-
         return ids.map((id) => cacheRef.current[id]?.data).filter(Boolean);
     }
 
     useEffect(() => {
-        const videoIds = ["M7lc1UVf-VE", "dQw4w9WgXcQ", "kxopViU98Xo"];
-        const playlistIds = [
-            "PLMC9KNkIncKtPzgY-5rmhvj7fax8fdxoj",
-            "PLFgquLnL59alCl_2TQvOiD5Vgm1hCaGSI",
-        ];
         async function init() {
+            const videoIds = await fetchRecommendedIds("video");
+            const playlistIds = await fetchRecommendedIds("playlist");
             const videosList = await fetchAndCache({
                 ids: videoIds,
                 cacheRef: videosCacheRef,
@@ -180,7 +207,7 @@ export default function MusicVideoList() {
             const playlistsList = await fetchAndCache({
                 ids: playlistIds,
                 cacheRef: playlistsCacheRef,
-                cacheKey: CACHE_KEY + "_playlists",
+                cacheKey: CACHE_KEY_PLAYLIST,
                 type: "playlist",
                 parseItem: (item) => ({
                     id: item.id,
@@ -193,13 +220,11 @@ export default function MusicVideoList() {
                     itemCount: item.contentDetails.itemCount,
                 }),
             });
-
             setVideos(videosList ?? []);
             setPlaylists(playlistsList ?? []);
         }
-
         init();
-    }, []);
+    }, [region]);
 
     return (
         <>

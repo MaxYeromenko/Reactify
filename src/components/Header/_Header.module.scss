@@ -1,8 +1,10 @@
 @use "/src/scss/patterns" as *;
 
 .header {
+    padding: 0 1%;
     display: grid;
     grid-template-columns: auto auto auto;
+    gap: 10px;
 
     .container {
         @extend %centered-flex;
@@ -28,6 +30,24 @@
                 a {
                     color: var(--text-color);
                 }
+            }
+        }
+    }
+
+    .region {
+        @extend %centered-flex;
+        grid-column: 3/4;
+
+        select {
+            @extend %rounded-all-edges;
+            width: 100%;
+            height: 55%;
+            text-align: center;
+            border: 0.125em solid var(--thirdly-color);
+            background-color: var(--primary-color);
+
+            option {
+                background-color: var(--quaternary-color);
             }
         }
     }

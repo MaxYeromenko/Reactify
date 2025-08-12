@@ -30,7 +30,8 @@ body footer {
 }
 body input[type=text],
 body input[type=range],
-body button {
+body button,
+body select {
   padding: 0.5em;
   min-height: 30px;
   color: var(--text-color);
