@@ -9,7 +9,7 @@ export default function App() {
         return localStorage.getItem("region") || "UA";
     });
     const [language, setLanguage] = useState(() => {
-        return localStorage.getItem("language") || "музика";
+        return localStorage.getItem("language") || "uk_українська музика";
     });
 
     async function handleSearch(query: string) {

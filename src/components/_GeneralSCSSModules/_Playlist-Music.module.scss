@@ -10,10 +10,6 @@
     border: 0.125em solid var(--quaternary-color);
     height: 150px;
 
-    * {
-        line-height: 1.5;
-    }
-
     .thumbnailContainer {
         @extend %centered-flex, %rounded-all-edges;
         width: 200px;

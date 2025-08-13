@@ -21,21 +21,41 @@ export default function Header({
     setLanguage,
 }: HeaderProps) {
     const regionCodes: (Region & { language: string })[] = [
-        { value: "UA", content: "UA (Ukraine)", language: "музика" },
-        { value: "US", content: "US (USA)", language: "music" },
-        { value: "GB", content: "GB (United Kingdom)", language: "music" },
-        { value: "DE", content: "DE (Germany)", language: "Musik" },
-        { value: "FR", content: "FR (France)", language: "musique" },
-        { value: "PL", content: "PL (Poland)", language: "muzyka" },
-        { value: "IT", content: "IT (Italy)", language: "musica" },
-        { value: "ES", content: "ES (Spain)", language: "música" },
-        { value: "JP", content: "JP (Japan)", language: "音楽" },
-        { value: "KR", content: "KR (South Korea)", language: "음악" },
-        { value: "BR", content: "BR (Brazil)", language: "música" },
-        { value: "IN", content: "IN (India)", language: "संगीत" },
-        { value: "RU", content: "RU (Russia)", language: "музыка" },
-        { value: "CA", content: "CA (Canada)", language: "music" },
-        { value: "AU", content: "AU (Australia)", language: "music" },
+        {
+            value: "UA",
+            content: "UA (Ukraine)",
+            language: "uk_українська музика",
+        },
+        { value: "US", content: "US (USA)", language: "en_American music" },
+        {
+            value: "GB",
+            content: "GB (United Kingdom)",
+            language: "en_British music",
+        },
+        { value: "DE", content: "DE (Germany)", language: "de_Deutsche Musik" },
+        {
+            value: "FR",
+            content: "FR (France)",
+            language: "fr_musique française",
+        },
+        { value: "PL", content: "PL (Poland)", language: "pl_polska muzyka" },
+        { value: "IT", content: "IT (Italy)", language: "it_musica italiana" },
+        { value: "ES", content: "ES (Spain)", language: "es_música española" },
+        { value: "JP", content: "JP (Japan)", language: "ja_日本の音楽" },
+        { value: "KR", content: "KR (South Korea)", language: "ko_한국 음악" },
+        {
+            value: "BR",
+            content: "BR (Brazil)",
+            language: "pt_música brasileira",
+        },
+        { value: "IN", content: "IN (India)", language: "hi_भारतीय संगीत" },
+        { value: "RU", content: "RU (Russia)", language: "ru_русская музыка" },
+        { value: "CA", content: "CA (Canada)", language: "en_Canadian music" },
+        {
+            value: "AU",
+            content: "AU (Australia)",
+            language: "en_Australian music",
+        },
     ];
 
     return (
@@ -52,7 +72,9 @@ export default function Header({
                     value={region}
                     onChange={(e) => {
                         setRegion(e.target.value);
-                        const selectedRegion = regionCodes.find(r => r.value === e.target.value);
+                        const selectedRegion = regionCodes.find(
+                            (r) => r.value === e.target.value
+                        );
                         if (selectedRegion) {
                             setLanguage(selectedRegion.language);
                         }

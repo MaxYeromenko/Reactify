@@ -9,11 +9,16 @@
     color: var(--text-color);
     transition: all 0.2s ease;
     outline: none;
+    scroll-behavior: smooth;
 
     &:focus {
         border-color: var(--quaternary-color) !important;
         text-decoration-color: var(--quaternary-color) !important;
     }
+}
+
+html::-webkit-scrollbar {
+    display: none;
 }
 
 html,

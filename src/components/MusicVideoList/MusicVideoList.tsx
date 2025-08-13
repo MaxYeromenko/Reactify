@@ -2,6 +2,7 @@ import classes from "./_MusicVideoList.module.scss";
 import { useEffect, useState, useRef } from "react";
 import MusicVideoItem from "../MusicVideoItem/MusicVideoItem";
 import PlaylistItem from "../PlaylistItem/PlaylistItem";
+import Button from "../Button/Button";
 
 export type VideoProps = {
     id: string;
@@ -61,6 +62,7 @@ export default function MusicVideoList({
 }) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
+    const MEDIA_COUNT = 16;
 
     const [videos, setVideos] = useState<VideoProps[]>([]);
     const videosCacheRef = useRef<Record<string, CachedVideo>>({});
@@ -96,10 +98,11 @@ export default function MusicVideoList({
         return data ?? { items: [] };
     }
 
-    async function fetchRecommendedIds(type: MediaType) {
+    async function fetchRecommendedIds(type: MediaType, count: number) {
         const makeUrl = (apiKey: string) =>
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}
-        &maxResults=10&regionCode=${region}&q=${language}&key=${apiKey}`;
+            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}&maxResults=${count}&regionCode=${region}&relevanceLanguage=${
+                language.split("_")[0]
+            }&q=${language.split("_")[1]}&key=${apiKey}`.replace("%20", "");
 
         const data = await fetchWithFallback(
             makeUrl(apiKeyFirst),
@@ -183,8 +186,11 @@ export default function MusicVideoList({
 
     useEffect(() => {
         async function init() {
-            const videoIds = await fetchRecommendedIds("video");
-            const playlistIds = await fetchRecommendedIds("playlist");
+            const vCount = Math.ceil(MEDIA_COUNT / 2);
+            const pCount = Math.floor(MEDIA_COUNT / 2);
+
+            const videoIds = await fetchRecommendedIds("video", vCount);
+            const playlistIds = await fetchRecommendedIds("playlist", pCount);
             const videosList = await fetchAndCache({
                 ids: videoIds,
                 cacheRef: videosCacheRef,
@@ -226,18 +232,41 @@ export default function MusicVideoList({
         init();
     }, [region]);
 
+    function inDevelopment() {
+        alert("Functionality is under development.");
+    }
+
     return (
         <>
             <div className={classes.divider}>
                 <h1>Videos</h1>
+            </div>
+            <div className={classes.buttonContainer}>
+                <Button onClick={inDevelopment}>
+                    <i className="fa-solid fa-arrow-left-long"></i>
+                </Button>
+                <span>Page: 1</span>
+                <Button onClick={inDevelopment}>
+                    <i className="fa-solid fa-arrow-right-long"></i>
+                </Button>
             </div>
             <div className={classes.musicVideoList}>
                 {videos.map((video) => (
                     <MusicVideoItem key={video.id} {...video} />
                 ))}
             </div>
+
             <div className={classes.divider}>
                 <h1>Playlists</h1>
+            </div>
+            <div className={classes.buttonContainer}>
+                <Button onClick={inDevelopment}>
+                    <i className="fa-solid fa-arrow-left-long"></i>
+                </Button>
+                <span>Page: 1</span>
+                <Button onClick={inDevelopment}>
+                    <i className="fa-solid fa-arrow-right-long"></i>
+                </Button>
             </div>
             <div className={classes.playlistList}>
                 {playlists.map((playlist) => (
