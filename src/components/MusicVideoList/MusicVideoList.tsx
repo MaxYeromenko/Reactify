@@ -11,6 +11,7 @@ type MusicVideoListProps = {
     language: string;
     query: string;
     search: boolean;
+    setSearch: (search: boolean) => void;
 };
 
 export type VideoProps = {
@@ -71,6 +72,7 @@ export default function MusicVideoList({
     onPlayPlaylist,
     query,
     search,
+    setSearch,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
@@ -110,7 +112,7 @@ export default function MusicVideoList({
         return data ?? { items: [] };
     }
 
-    async function fetchRecommendedIds(type: MediaType, count: number) {
+    async function fetchFilteredIds(type: MediaType, count: number) {
         const makeUrl = (apiKey: string) =>
             `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}&maxResults=${count}&regionCode=${region}&relevanceLanguage=${
                 language.split("_")[0]
@@ -203,8 +205,8 @@ export default function MusicVideoList({
             const vCount = Math.ceil(MEDIA_COUNT / 2);
             const pCount = Math.floor(MEDIA_COUNT / 2);
 
-            const videoIds = await fetchRecommendedIds("video", vCount);
-            const playlistIds = await fetchRecommendedIds("playlist", pCount);
+            const videoIds = await fetchFilteredIds("video", vCount);
+            const playlistIds = await fetchFilteredIds("playlist", pCount);
 
             const videosList = await fetchAndCache({
                 ids: videoIds,
@@ -244,7 +246,12 @@ export default function MusicVideoList({
             setVideos(videosList ?? []);
             setPlaylists(playlistsList ?? []);
         }
-        init();
+        if (search) {
+            init();
+            setSearch(false);
+        } else if (!search && query.trim() === "") {
+            init();
+        }
     }, [region, search]);
 
     function inDevelopment() {

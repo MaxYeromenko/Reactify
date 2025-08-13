@@ -11,6 +11,7 @@ type MainProps = {
     language: string;
     query: string;
     search: boolean;
+    setSearch: (search: boolean) => void;
 };
 
 export default function Main({
@@ -22,6 +23,7 @@ export default function Main({
     onPlayPlaylist,
     query,
     search,
+    setSearch,
 }: MainProps) {
     return (
         <main className={classes.main}>
@@ -36,6 +38,7 @@ export default function Main({
                 language={language}
                 query={query}
                 search={search}
+                setSearch={setSearch}
             />
         </main>
     );

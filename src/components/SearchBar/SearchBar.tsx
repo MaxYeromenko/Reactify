@@ -51,10 +51,8 @@ export default function SearchBar({
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (query.trim() !== "") {
-            setSearch(true);
-            setSuggestions([]);
-        }
+        setSearch(true);
+        setSuggestions([]);
     }
 
     return (

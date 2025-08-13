@@ -54,6 +54,7 @@ export default function App() {
                 language={language}
                 query={query}
                 search={search}
+                setSearch={setSearch}
             />
             <Footer />
         </>
