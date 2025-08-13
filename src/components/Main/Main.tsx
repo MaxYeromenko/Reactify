@@ -3,23 +3,31 @@ import YouTubePlayer from "../YouTubePlayer/YouTubePlayer";
 import MusicVideoList from "../MusicVideoList/MusicVideoList";
 
 type MainProps = {
-    onSearch: (query: string) => void;
-    videoId: string;
+    onPlayVideo: (query: string) => void;
+    onPlayPlaylist: (id: string) => void;
+    videoId: string | null;
+    playlistId: string | null;
     region: string;
     language: string;
 };
 
 export default function Main({
     videoId,
+    playlistId,
     region,
     language,
-    onSearch,
+    onPlayVideo,
+    onPlayPlaylist,
 }: MainProps) {
     return (
         <main className={classes.main}>
-            <YouTubePlayer videoId={videoId} />
+            <YouTubePlayer
+                videoId={videoId ?? undefined}
+                playlistId={playlistId ?? undefined}
+            />
             <MusicVideoList
-                onSearch={onSearch}
+                onPlayVideo={onPlayVideo}
+                onPlayPlaylist={onPlayPlaylist}
                 region={region}
                 language={language}
             />

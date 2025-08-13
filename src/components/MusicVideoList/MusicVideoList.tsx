@@ -5,7 +5,8 @@ import PlaylistItem from "../PlaylistItem/PlaylistItem";
 import Button from "../Button/Button";
 
 type MusicVideoListProps = {
-    onSearch: (query: string) => void;
+    onPlayVideo: (query: string) => void;
+    onPlayPlaylist: (query: string) => void;
     region: string;
     language: string;
 };
@@ -19,7 +20,7 @@ export type VideoProps = {
     publishedAt: string;
     viewCount?: number;
     likeCount?: number;
-    onSearch: (query: string) => void;
+    onPlayVideo: (query: string) => void;
 };
 
 type CachedVideo = {
@@ -34,7 +35,7 @@ export type PlaylistsProps = {
     thumbnailUrl: string;
     itemCount?: number;
     publishedAt: string;
-    onSearch: (query: string) => void;
+    onPlayPlaylist: (query: string) => void;
 };
 
 type CachedPlaylist = {
@@ -64,7 +65,8 @@ function formatDuration(isoDuration: string) {
 export default function MusicVideoList({
     region,
     language,
-    onSearch,
+    onPlayVideo,
+    onPlayPlaylist,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
@@ -261,7 +263,7 @@ export default function MusicVideoList({
                     <MusicVideoItem
                         key={video.id}
                         {...video}
-                        onSearch={onSearch}
+                        onPlayVideo={onPlayVideo}
                     />
                 ))}
             </div>
@@ -283,7 +285,7 @@ export default function MusicVideoList({
                     <PlaylistItem
                         key={playlist.id}
                         {...playlist}
-                        onSearch={onSearch}
+                        onPlayPlaylist={onPlayPlaylist}
                     />
                 ))}
             </div>

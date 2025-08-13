@@ -22,7 +22,13 @@ function formatTime(seconds: number) {
     return hh + mm + ":" + ss;
 }
 
-export default function YouTubePlayer({ videoId }: { videoId: string }) {
+export default function YouTubePlayer({
+    videoId,
+    playlistId,
+}: {
+    videoId?: string | null;
+    playlistId?: string | null;
+}) {
     const playerRef = useRef<YT.Player | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(10);
@@ -37,15 +43,26 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
         document.body.appendChild(tag);
 
         window.onYouTubeIframeAPIReady = () => {
+            if (!videoId && !playlistId) return;
             playerRef.current = new window.YT.Player("yt-player", {
-                videoId,
-                playerVars: {
-                    controls: 0,
-                    modestbranding: 1,
-                    rel: 0,
-                    disablekb: 1,
-                    autoplay: 0,
-                },
+                videoId: playlistId ? undefined : (videoId as string),
+                playerVars: playlistId
+                    ? {
+                          listType: "playlist",
+                          list: playlistId as string,
+                          controls: 0,
+                          modestbranding: 1,
+                          rel: 0,
+                          disablekb: 1,
+                          autoplay: 0,
+                      }
+                    : {
+                          controls: 0,
+                          modestbranding: 1,
+                          rel: 0,
+                          disablekb: 1,
+                          autoplay: 0,
+                      },
                 events: {
                     onReady: () => {
                         if (playerRef.current) {
@@ -73,10 +90,18 @@ export default function YouTubePlayer({ videoId }: { videoId: string }) {
 
     useEffect(() => {
         if (playerRef.current) {
-            playerRef.current.loadVideoById(videoId);
+            playerRef.current.stopVideo();
+            if (playlistId) {
+                playerRef.current.loadPlaylist({
+                    listType: "playlist",
+                    list: playlistId,
+                });
+            } else if (videoId) {
+                playerRef.current.loadVideoById(videoId);
+            }
             playerRef.current.setVolume(volume);
         }
-    }, [videoId]);
+    }, [videoId, playlistId]);
 
     useEffect(() => {
         let intervalId: NodeJS.Timeout | null = null;

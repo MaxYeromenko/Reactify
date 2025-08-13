@@ -4,7 +4,9 @@ import Footer from "./components/Footer/Footer";
 import { useEffect, useState } from "react";
 
 export default function App() {
-    const [videoId, setVideoId] = useState("dQw4w9WgXcQ");
+    const [videoId, setVideoId] = useState<string | null>("dQw4w9WgXcQ");
+    const [playlistId, setPlaylistId] = useState<string | null>(null);
+
     const [region, setRegion] = useState(() => {
         return localStorage.getItem("region") || "UA";
     });
@@ -37,8 +39,18 @@ export default function App() {
 
         const data = await res.json();
         if (data.items && data.items.length > 0) {
+            setPlaylistId(null);
             setVideoId(data.items[0].id.videoId);
         }
+    }
+
+    function handlePlayVideo(id: string) {
+        setPlaylistId(null);
+        setVideoId(id);
+    }
+    function handlePlayPlaylist(id: string) {
+        setVideoId(null);
+        setPlaylistId(id);
     }
 
     useEffect(() => {
@@ -59,7 +71,14 @@ export default function App() {
                 setRegion={setRegion}
                 setLanguage={setLanguage}
             />
-            <Main onSearch={handleSearch} videoId={videoId} region={region} language={language} />
+            <Main
+                onPlayVideo={handlePlayVideo}
+                onPlayPlaylist={handlePlayPlaylist}
+                videoId={videoId}
+                playlistId={playlistId}
+                region={region}
+                language={language}
+            />
             <Footer />
         </>
     );

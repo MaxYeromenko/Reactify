@@ -2,16 +2,17 @@ import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
 import type { PlaylistsProps } from "../MusicVideoList/MusicVideoList";
 
 export default function MusicVideoItem({
+    id,
     title,
     channelTitle,
     thumbnailUrl,
     itemCount,
     publishedAt,
-    onSearch,
+    onPlayPlaylist,
 }: PlaylistsProps) {
     function handleClick() {
-        if (title.trim() !== "") {
-            onSearch(title.trim());
+        if (id.trim() !== "") {
+            onPlayPlaylist(id.trim());
         }
     }
 
