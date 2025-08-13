@@ -62,7 +62,7 @@ export default function Header({
         <header className={classes.header}>
             <div className={classes.container}>
                 <p className={classes.logo}>
-                    <a href="/">Reactify</a>
+                    <a href="#top">Reactify</a>
                 </p>
             </div>
             <SearchBar onSearch={onSearch}></SearchBar>

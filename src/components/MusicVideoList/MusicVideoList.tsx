@@ -4,6 +4,12 @@ import MusicVideoItem from "../MusicVideoItem/MusicVideoItem";
 import PlaylistItem from "../PlaylistItem/PlaylistItem";
 import Button from "../Button/Button";
 
+type MusicVideoListProps = {
+    onSearch: (query: string) => void;
+    region: string;
+    language: string;
+};
+
 export type VideoProps = {
     id: string;
     title: string;
@@ -13,6 +19,7 @@ export type VideoProps = {
     publishedAt: string;
     viewCount?: number;
     likeCount?: number;
+    onSearch: (query: string) => void;
 };
 
 type CachedVideo = {
@@ -27,6 +34,7 @@ export type PlaylistsProps = {
     thumbnailUrl: string;
     itemCount?: number;
     publishedAt: string;
+    onSearch: (query: string) => void;
 };
 
 type CachedPlaylist = {
@@ -56,10 +64,8 @@ function formatDuration(isoDuration: string) {
 export default function MusicVideoList({
     region,
     language,
-}: {
-    region: string;
-    language: string;
-}) {
+    onSearch,
+}: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
     const MEDIA_COUNT = 16;
@@ -252,7 +258,11 @@ export default function MusicVideoList({
             </div>
             <div className={classes.musicVideoList}>
                 {videos.map((video) => (
-                    <MusicVideoItem key={video.id} {...video} />
+                    <MusicVideoItem
+                        key={video.id}
+                        {...video}
+                        onSearch={onSearch}
+                    />
                 ))}
             </div>
 
@@ -270,7 +280,11 @@ export default function MusicVideoList({
             </div>
             <div className={classes.playlistList}>
                 {playlists.map((playlist) => (
-                    <PlaylistItem key={playlist.id} {...playlist} />
+                    <PlaylistItem
+                        key={playlist.id}
+                        {...playlist}
+                        onSearch={onSearch}
+                    />
                 ))}
             </div>
         </>

@@ -59,7 +59,7 @@ export default function App() {
                 setRegion={setRegion}
                 setLanguage={setLanguage}
             />
-            <Main videoId={videoId} region={region} language={language} />
+            <Main onSearch={handleSearch} videoId={videoId} region={region} language={language} />
             <Footer />
         </>
     );

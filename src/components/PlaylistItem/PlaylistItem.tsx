@@ -7,7 +7,14 @@ export default function MusicVideoItem({
     thumbnailUrl,
     itemCount,
     publishedAt,
+    onSearch,
 }: PlaylistsProps) {
+    function handleClick() {
+        if (title.trim() !== "") {
+            onSearch(title.trim());
+        }
+    }
+
     return (
         <div className={generalClasses.playlistItem}>
             <div className={generalClasses.thumbnailContainer}>
@@ -17,11 +24,15 @@ export default function MusicVideoItem({
                     className={generalClasses.thumbnail}
                 />
                 {itemCount && (
-                    <span className={generalClasses.itemCount}>{itemCount} videos</span>
+                    <span className={generalClasses.itemCount}>
+                        {itemCount} videos
+                    </span>
                 )}
             </div>
             <div className={generalClasses.info}>
-                <h3 className={generalClasses.title}>{title}</h3>
+                <h3 onClick={handleClick} className={generalClasses.title}>
+                    {title}
+                </h3>
                 <p className={generalClasses.channel}>{channelTitle}</p>
                 <div className={generalClasses.meta}>
                     <div>
