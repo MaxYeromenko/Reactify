@@ -13,8 +13,11 @@ export default function App() {
     const [language, setLanguage] = useState(() => {
         return localStorage.getItem("language") || "uk_українська музика";
     });
+    const [query, setQuery] = useState("");
+    const [search, setSearch] = useState(false);
 
     async function handleSearch(query: string) {
+        setQuery(query);
         const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
         const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
 
@@ -66,10 +69,12 @@ export default function App() {
     return (
         <>
             <Header
-                onSearch={handleSearch}
+                query={query}
+                setQuery={setQuery}
                 region={region}
                 setRegion={setRegion}
                 setLanguage={setLanguage}
+                setSearch={setSearch}
             />
             <Main
                 onPlayVideo={handlePlayVideo}
@@ -78,6 +83,8 @@ export default function App() {
                 playlistId={playlistId}
                 region={region}
                 language={language}
+                query={query}
+                search={search}
             />
             <Footer />
         </>

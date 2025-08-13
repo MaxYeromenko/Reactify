@@ -3,24 +3,27 @@ import classes from "./_SearchBar.module.scss";
 import { useState, useEffect, useRef } from "react";
 
 export default function SearchBar({
-    onSearch,
+    query,
+    setQuery,
+    setSearch,
 }: {
-    onSearch: (q: string) => void;
+    query: string;
+    setQuery: (q: string) => void;
+    setSearch: (search: boolean) => void;
 }) {
-    const [input, setInput] = useState("");
     let [suggestions, setSuggestions] = useState<string[]>([]);
     const [isFocused, setIsFocused] = useState(false);
     const containerRef = useRef<HTMLFormElement>(null);
 
     useEffect(() => {
-        if (!input.trim()) {
+        if (!query.trim()) {
             setSuggestions([]);
             return;
         }
 
         const fetchSuggestions = async () => {
             const res = await fetch(
-                `/api/suggestions?q=${encodeURIComponent(input)}`
+                `/api/suggestions?q=${encodeURIComponent(query)}`
             );
             const data = await res.json();
             setSuggestions(data.suggestions || []);
@@ -28,7 +31,7 @@ export default function SearchBar({
 
         const delay = setTimeout(fetchSuggestions, 300);
         return () => clearTimeout(delay);
-    }, [input]);
+    }, [query]);
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -48,8 +51,8 @@ export default function SearchBar({
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        if (input.trim() !== "") {
-            onSearch(input.trim());
+        if (query.trim() !== "") {
+            setSearch(true);
             setSuggestions([]);
         }
     }
@@ -66,8 +69,8 @@ export default function SearchBar({
                     <input
                         type="text"
                         className={classes.input}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
+                        value={query}
+                        onChange={(e) => setQuery(e.target.value)}
                         placeholder="Search for your favorite tracks..."
                     />
                     <Button type="submit">Search</Button>
@@ -78,8 +81,7 @@ export default function SearchBar({
                             <li
                                 key={i}
                                 onClick={() => {
-                                    setInput(s);
-                                    onSearch(s);
+                                    setQuery(s);
                                     setSuggestions([]);
                                     setIsFocused(false);
                                 }}

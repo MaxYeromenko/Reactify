@@ -9,6 +9,8 @@ type MainProps = {
     playlistId: string | null;
     region: string;
     language: string;
+    query: string;
+    search: boolean;
 };
 
 export default function Main({
@@ -18,6 +20,8 @@ export default function Main({
     language,
     onPlayVideo,
     onPlayPlaylist,
+    query,
+    search,
 }: MainProps) {
     return (
         <main className={classes.main}>
@@ -30,6 +34,8 @@ export default function Main({
                 onPlayPlaylist={onPlayPlaylist}
                 region={region}
                 language={language}
+                query={query}
+                search={search}
             />
         </main>
     );

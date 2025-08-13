@@ -9,6 +9,8 @@ type MusicVideoListProps = {
     onPlayPlaylist: (query: string) => void;
     region: string;
     language: string;
+    query: string;
+    search: boolean;
 };
 
 export type VideoProps = {
@@ -67,6 +69,8 @@ export default function MusicVideoList({
     language,
     onPlayVideo,
     onPlayPlaylist,
+    query,
+    search,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
@@ -110,7 +114,9 @@ export default function MusicVideoList({
         const makeUrl = (apiKey: string) =>
             `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}&maxResults=${count}&regionCode=${region}&relevanceLanguage=${
                 language.split("_")[0]
-            }&q=${language.split("_")[1]}&key=${apiKey}`.replace("%20", "");
+            }&q=${
+                search ? query : language.split("_")[1]
+            }&key=${apiKey}`.replace("%20", "");
 
         const data = await fetchWithFallback(
             makeUrl(apiKeyFirst),
@@ -238,7 +244,7 @@ export default function MusicVideoList({
             setPlaylists(playlistsList ?? []);
         }
         init();
-    }, [region]);
+    }, [region, search]);
 
     function inDevelopment() {
         alert("Functionality is under development.");

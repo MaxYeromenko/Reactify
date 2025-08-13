@@ -2,10 +2,12 @@ import classes from "./_Header.module.scss";
 import SearchBar from "../SearchBar/SearchBar";
 
 type HeaderProps = {
-    onSearch: (query: string) => void;
+    query: string;
+    setQuery: (query: string) => void;
     region: string;
     setRegion: (region: string) => void;
     setLanguage: (language: string) => void;
+    setSearch: (search: boolean) => void;
 };
 
 type Region = {
@@ -15,10 +17,12 @@ type Region = {
 };
 
 export default function Header({
-    onSearch,
+    query,
+    setQuery,
     region,
     setRegion,
     setLanguage,
+    setSearch,
 }: HeaderProps) {
     const regionCodes: (Region & { language: string })[] = [
         {
@@ -65,7 +69,11 @@ export default function Header({
                     <a href="#top">Reactify</a>
                 </p>
             </div>
-            <SearchBar onSearch={onSearch}></SearchBar>
+            <SearchBar
+                query={query}
+                setQuery={setQuery}
+                setSearch={setSearch}
+            />
             <div className={classes.region}>
                 <select
                     id="region"
