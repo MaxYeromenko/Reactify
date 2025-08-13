@@ -16,37 +16,6 @@ export default function App() {
     const [query, setQuery] = useState("");
     const [search, setSearch] = useState(false);
 
-    async function handleSearch(query: string) {
-        setQuery(query);
-        const apiKey = import.meta.env.VITE_YOUTUBE_API_KEY;
-        const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
-
-        async function fetchWithKey(key: string) {
-            const res = await fetch(
-                `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCategoryId=10&q=${encodeURIComponent(
-                    query
-                )}&key=${key}&maxResults=1`
-            );
-            return res;
-        }
-
-        let res = await fetchWithKey(apiKey);
-
-        if (!res.ok && apiKeySecond) {
-            res = await fetchWithKey(apiKeySecond);
-        }
-
-        if (!res.ok) {
-            return;
-        }
-
-        const data = await res.json();
-        if (data.items && data.items.length > 0) {
-            setPlaylistId(null);
-            setVideoId(data.items[0].id.videoId);
-        }
-    }
-
     function handlePlayVideo(id: string) {
         setPlaylistId(null);
         setVideoId(id);
