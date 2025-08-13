@@ -1,16 +1,24 @@
 @use "/src/scss/patterns" as *;
 
 .header {
-    padding: 0 1%;
-    display: grid;
-    grid-template-columns: auto auto auto;
+    @extend %centered-flex;
+    flex-wrap: wrap;
     gap: 10px;
+    padding: 1%;
+
+    .container,
+    .region {
+        @extend %centered-flex;
+        flex-grow: 1;
+    }
 
     .container {
-        @extend %centered-flex;
         justify-content: flex-start;
-        grid-column: 1/2;
-        padding: 5%;
+        padding: 1%;
+
+        * {
+            line-height: 1.05;
+        }
 
         .logo {
             font-size: 2.5em;
@@ -34,21 +42,26 @@
         }
     }
 
-    .region {
-        @extend %centered-flex;
-        grid-column: 3/4;
+    .region select {
+        @extend %rounded-all-edges;
+        width: 100%;
+        height: 55%;
+        text-align: center;
+        border: 0.125em solid var(--thirdly-color);
+        background-color: var(--primary-color);
 
-        select {
-            @extend %rounded-all-edges;
-            width: 100%;
-            height: 55%;
-            text-align: center;
-            border: 0.125em solid var(--thirdly-color);
-            background-color: var(--primary-color);
+        option {
+            background-color: var(--quaternary-color);
+        }
+    }
+}
 
-            option {
-                background-color: var(--quaternary-color);
-            }
+@media (max-width:423px) {
+    .header {
+        padding: 3%;
+
+        .container {
+            justify-content: center;
         }
     }
 }

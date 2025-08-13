@@ -18,6 +18,18 @@
         overflow: hidden;
         border: 0.125em solid var(--quaternary-color);
         overflow: hidden;
+        cursor: pointer;
+
+        &:hover {
+            border: 0.125em solid var(--text-color);
+            transform: scale(1.05);
+
+            .duration,
+            .itemCount {
+                color: var(--quaternary-color);
+                background-color: var(--text-color);
+            }
+        }
 
         .thumbnail {
             @extend %centered-flex;
@@ -30,7 +42,6 @@
             min-width: 100%;
             min-height: 100%;
             object-fit: cover;
-            cursor: pointer;
         }
 
         .duration,

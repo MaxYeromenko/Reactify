@@ -47,7 +47,7 @@
 
             span,
             input[type="range"] {
-                height: 100%;
+                min-height: 30px;
                 background-color: var(--secondary-color);
             }
 
@@ -100,4 +100,26 @@
 
 .resetAspectRatio {
     aspect-ratio: unset;
+}
+
+@media (max-width:760px) {
+    .container {
+        padding: 3%;
+        position: static;
+        width: 100%;
+
+        .playerContainer {
+            Button {
+                display: none;
+            }
+
+            .progressBarContainer {
+
+                span,
+                input[type="range"] {
+                    border-top: 0.125em solid var(--thirdly-color);
+                }
+            }
+        }
+    }
 }

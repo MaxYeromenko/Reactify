@@ -12,9 +12,11 @@ export default function MusicVideoItem({
 }: PlaylistsProps) {
     return (
         <div className={generalClasses.playlistItem}>
-            <div className={generalClasses.thumbnailContainer}>
+            <div
+                onClick={() => onPlayPlaylist(id)}
+                className={generalClasses.thumbnailContainer}
+            >
                 <img
-                    onClick={() => onPlayPlaylist(id)}
                     src={thumbnailUrl}
                     alt={title}
                     className={generalClasses.thumbnail}

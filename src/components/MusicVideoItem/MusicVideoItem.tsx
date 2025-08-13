@@ -14,9 +14,11 @@ export default function MusicVideoItem({
 }: VideoProps) {
     return (
         <div className={generalClasses.musicVideoItem}>
-            <div className={generalClasses.thumbnailContainer}>
+            <div
+                onClick={() => onPlayVideo(id)}
+                className={generalClasses.thumbnailContainer}
+            >
                 <img
-                    onClick={() => onPlayVideo(id)}
                     src={thumbnailUrl}
                     alt={title}
                     className={generalClasses.thumbnail}

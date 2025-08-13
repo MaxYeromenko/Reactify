@@ -2,8 +2,7 @@
 
 .searchBar {
     @extend %centered-flex;
-    flex-direction: column;
-    grid-column: 2/3;
+    flex-grow: 1;
     position: relative;
 
     .container {
