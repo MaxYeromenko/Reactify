@@ -10,16 +10,11 @@ export default function MusicVideoItem({
     publishedAt,
     onPlayPlaylist,
 }: PlaylistsProps) {
-    function handleClick() {
-        if (id.trim() !== "") {
-            onPlayPlaylist(id.trim());
-        }
-    }
-
     return (
         <div className={generalClasses.playlistItem}>
             <div className={generalClasses.thumbnailContainer}>
                 <img
+                    onClick={() => onPlayPlaylist(id)}
                     src={thumbnailUrl}
                     alt={title}
                     className={generalClasses.thumbnail}
@@ -31,7 +26,10 @@ export default function MusicVideoItem({
                 )}
             </div>
             <div className={generalClasses.info}>
-                <h3 onClick={handleClick} className={generalClasses.title}>
+                <h3
+                    onClick={() => onPlayPlaylist(id)}
+                    className={generalClasses.title}
+                >
                     {title}
                 </h3>
                 <p className={generalClasses.channel}>{channelTitle}</p>

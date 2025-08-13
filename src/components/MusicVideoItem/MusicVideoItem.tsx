@@ -12,16 +12,11 @@ export default function MusicVideoItem({
     likeCount,
     onPlayVideo,
 }: VideoProps) {
-    function handleClick() {
-        if (id.trim() !== "") {
-            onPlayVideo(id.trim());
-        }
-    }
-
     return (
         <div className={generalClasses.musicVideoItem}>
             <div className={generalClasses.thumbnailContainer}>
                 <img
+                    onClick={() => onPlayVideo(id)}
                     src={thumbnailUrl}
                     alt={title}
                     className={generalClasses.thumbnail}
@@ -31,7 +26,10 @@ export default function MusicVideoItem({
                 )}
             </div>
             <div className={generalClasses.info}>
-                <h3 onClick={handleClick} className={generalClasses.title}>
+                <h3
+                    onClick={() => onPlayVideo(id)}
+                    className={generalClasses.title}
+                >
                     {title}
                 </h3>
                 <p className={generalClasses.channel}>{channelTitle}</p>
