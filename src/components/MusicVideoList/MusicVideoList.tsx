@@ -205,6 +205,7 @@ export default function MusicVideoList({
 
             const videoIds = await fetchRecommendedIds("video", vCount);
             const playlistIds = await fetchRecommendedIds("playlist", pCount);
+
             const videosList = await fetchAndCache({
                 ids: videoIds,
                 cacheRef: videosCacheRef,
