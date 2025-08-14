@@ -44,32 +44,34 @@
         .progressBarContainer {
             @extend %centered-flex;
             width: 100%;
+            max-width: 100%;
 
             span,
             input[type="range"] {
-                min-height: 30px;
+                min-height: 35px;
                 background-color: var(--secondary-color);
             }
 
             span {
                 @extend %centered-flex;
-                flex: 1;
-                border: 0 solid var(--thirdly-color);
                 padding: 1em;
+                width: 20%;
+                border: 0 solid var(--thirdly-color);
 
                 &:first-of-type {
                     border-left-width: 0.125em;
-                }
-
-                &:last-of-type {
-                    border-right-width: 0.125em;
                 }
             }
 
             input[type="range"] {
                 @extend %rounded-no-edges;
-                flex: 3;
+                width: 50%;
                 border: none;
+            }
+
+            Button {
+                width: 10%;
+                border-width: 0 0.125em 0 0.125em;
             }
         }
 
@@ -87,13 +89,19 @@
     .controls {
         @extend %centered-flex;
         width: 100%;
+        max-width: 100%;
 
         Button {
             width: 100%;
+
+            &:first-of-type {
+                border-radius: 0 0 0 $round-edges;
+            }
         }
 
-        Button:first-of-type {
-            border-radius: 0 0 0 $round-edges;
+        input {
+            width: 100%;
+            border-radius: 0 0 $round-edges 0;
         }
     }
 }
@@ -109,16 +117,12 @@
         width: 100%;
 
         .playerContainer {
-            Button {
+            &>Button {
                 display: none;
             }
 
-            .progressBarContainer {
-
-                span,
-                input[type="range"] {
-                    border-top: 0.125em solid var(--thirdly-color);
-                }
+            .iframeContainer {
+                border-width: 0.125em;
             }
         }
     }

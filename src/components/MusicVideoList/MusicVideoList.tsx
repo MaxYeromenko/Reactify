@@ -12,6 +12,8 @@ type MusicVideoListProps = {
     query: string;
     search: boolean;
     setSearch: (search: boolean) => void;
+    idList: string[];
+    setIdList: (idList: string[]) => void;
 };
 
 export type VideoProps = {
@@ -24,6 +26,8 @@ export type VideoProps = {
     viewCount?: number;
     likeCount?: number;
     onPlayVideo: (query: string) => void;
+    idList: string[];
+    setIdList: (idList: string[]) => void;
 };
 
 type CachedVideo = {
@@ -73,9 +77,12 @@ export default function MusicVideoList({
     query,
     search,
     setSearch,
+    idList,
+    setIdList,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
+    const CACHE_KEY_SEARCH = "youtubeSearchCache";
     const MEDIA_COUNT = 16;
 
     const [videos, setVideos] = useState<VideoProps[]>([]);
@@ -112,42 +119,85 @@ export default function MusicVideoList({
         return data ?? { items: [] };
     }
 
-    async function fetchFilteredIds(type: MediaType, count: number) {
-        const makeUrl = (apiKey: string) =>
-            `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}&maxResults=${count}&regionCode=${region}&relevanceLanguage=${
-                language.split("_")[0]
-            }&q=${
-                search ? query : language.split("_")[1]
-            }&key=${apiKey}`.replace("%20", "");
+    async function fetchMediaIds(vCount: number, pCount: number) {
+        const now = Date.now();
 
-        const data = await fetchWithFallback(
-            makeUrl(apiKeyFirst),
-            makeUrl(apiKeySecond)
-        );
-        if (!data || !data.items) return [];
-
-        let ids = data.items
-            .map((item: any) =>
-                type === "video" ? item.id.videoId : item.id.playlistId
-            )
-            .filter(Boolean);
-        if (type === "video" && ids.length) {
-            const details = await fetchMediaByIds(ids, "video");
-            ids = details.items
-                .filter((item: any) => {
-                    const match =
-                        item.contentDetails.duration.match(/PT(\d+M)?(\d+S)?/);
-                    const minutes = match?.[1] ? parseInt(match[1]) : 0;
-                    const seconds = match?.[2] ? parseInt(match[2]) : 0;
-                    return (
-                        minutes > 1 ||
-                        (minutes === 1 && seconds > 0) ||
-                        seconds > 60
-                    );
-                })
-                .map((item: any) => item.id);
+        let searchCache: Record<string, any> = {};
+        try {
+            searchCache = JSON.parse(
+                localStorage.getItem(CACHE_KEY_SEARCH) || "{}"
+            );
+        } catch {
+            searchCache = {};
         }
-        return ids;
+
+        const cacheKeyBase = `${region}_${
+            search ? query : language.split("_")[1]
+        }`.toLowerCase();
+
+        const getIds = async (type: MediaType, count: number) => {
+            const cacheKey = `${cacheKeyBase}_${type}`;
+
+            if (
+                searchCache[cacheKey] &&
+                now - searchCache[cacheKey].timestamp < TTL
+            ) {
+                return searchCache[cacheKey].ids;
+            }
+
+            const makeUrl = (apiKey: string) =>
+                `https://www.googleapis.com/youtube/v3/search?part=snippet&type=${type}&maxResults=${count}&regionCode=${region}&relevanceLanguage=${
+                    language.split("_")[0]
+                }&q=${
+                    search
+                        ? query
+                        : language.split("_")[1] +
+                          Math.random().toString(36).slice(2, 3)
+                }&key=${apiKey}`.replace("%20", "");
+
+            const data = await fetchWithFallback(
+                makeUrl(apiKeyFirst),
+                makeUrl(apiKeySecond)
+            );
+            if (!data || !data.items) return [];
+
+            let ids =
+                type === "video"
+                    ? data.items
+                          .map((item: any) => item.id.videoId)
+                          .filter(Boolean)
+                    : data.items
+                          .map((item: any) => item.id.playlistId)
+                          .filter(Boolean);
+
+            if (type === "video" && ids.length) {
+                const details = await fetchMediaByIds(ids, "video");
+                ids = details.items
+                    .filter((item: any) => {
+                        const match =
+                            item.contentDetails.duration.match(
+                                /PT(\d+M)?(\d+S)?/
+                            );
+                        const minutes = match?.[1] ? parseInt(match[1]) : 0;
+                        const seconds = match?.[2] ? parseInt(match[2]) : 0;
+                        return (
+                            minutes > 1 ||
+                            (minutes === 1 && seconds > 0) ||
+                            seconds > 60
+                        );
+                    })
+                    .map((item: any) => item.id);
+            }
+
+            searchCache[cacheKey] = { ids, timestamp: now };
+            localStorage.setItem(CACHE_KEY_SEARCH, JSON.stringify(searchCache));
+            return ids;
+        };
+
+        const videoIds = await getIds("video", vCount);
+        const playlistIds = await getIds("playlist", pCount);
+
+        return { videoIds, playlistIds };
     }
 
     useEffect(() => {
@@ -182,31 +232,41 @@ export default function MusicVideoList({
         parseItem: (item: any) => any;
     }) {
         const now = Date.now();
+
+        if (!Object.keys(cacheRef.current).length) {
+            try {
+                const saved = localStorage.getItem(cacheKey);
+                if (saved) cacheRef.current = JSON.parse(saved);
+            } catch {}
+        }
+
         const idsToFetch = ids.filter(
             (id) =>
                 !cacheRef.current[id] ||
                 now - cacheRef.current[id].timestamp > TTL
         );
+
         if (idsToFetch.length > 0) {
-            let data = await fetchMediaByIds(idsToFetch, type);
+            const data = await fetchMediaByIds(idsToFetch, type);
             data.items.forEach((item: any) => {
                 cacheRef.current[item.id] = {
                     data: parseItem(item),
                     timestamp: now,
                 };
             });
-            localStorage.setItem(cacheKey, JSON.stringify(cacheRef.current));
         }
+
+        localStorage.setItem(cacheKey, JSON.stringify(cacheRef.current));
+
         return ids.map((id) => cacheRef.current[id]?.data).filter(Boolean);
     }
 
     useEffect(() => {
         async function init() {
-            const vCount = Math.ceil(MEDIA_COUNT / 2);
-            const pCount = Math.floor(MEDIA_COUNT / 2);
-
-            const videoIds = await fetchFilteredIds("video", vCount);
-            const playlistIds = await fetchFilteredIds("playlist", pCount);
+            const { videoIds, playlistIds } = await fetchMediaIds(
+                Math.ceil(MEDIA_COUNT / 2),
+                Math.floor(MEDIA_COUNT / 2)
+            );
 
             const videosList = await fetchAndCache({
                 ids: videoIds,
@@ -278,6 +338,8 @@ export default function MusicVideoList({
                         key={video.id}
                         {...video}
                         onPlayVideo={onPlayVideo}
+                        idList={idList}
+                        setIdList={setIdList}
                     />
                 ))}
             </div>

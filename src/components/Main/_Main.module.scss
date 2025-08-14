@@ -1,3 +1,5 @@
+@use "/src/scss/patterns" as *;
+
 .main {
     padding: 1%;
     width: 100%;
@@ -8,5 +10,20 @@
 
     * {
         line-height: normal;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .buttonsContainer {
+        @extend %centered-flex;
+        gap: 10px;
+        padding: 1%;
+
+        button {
+            @extend %rounded-all-edges;
+            flex-grow: 1;
+        }
     }
 }

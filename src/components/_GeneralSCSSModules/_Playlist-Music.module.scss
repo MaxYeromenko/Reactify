@@ -83,7 +83,6 @@
 
         .meta {
             @extend %centered-flex;
-            flex-wrap: wrap;
             justify-content: space-between;
             gap: 10px;
 
@@ -100,8 +99,9 @@
                     background-color: var(--quinary-color);
                 }
 
-                .type {
-                    background-color: var(--quaternary-color);
+                button {
+                    @extend %rounded-all-edges;
+                    min-width: 70px;
                 }
             }
         }

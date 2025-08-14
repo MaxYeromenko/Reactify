@@ -36,6 +36,9 @@ export default function YouTubePlayer({
     const [currentTime, setCurrentTime] = useState(0);
     const [videoLength, setVideoLength] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
+    const [previousId, setPreviousId] = useState("");
+    const [nextId, setNextId] = useState("");
+    const [isCycled, setIsCycled] = useState(false);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -159,7 +162,7 @@ export default function YouTubePlayer({
                 >
                     <div id="yt-player" className={classes.iframe}></div>
                 </div>
-                <Button onClick={() => setHidden(!hidden)}>
+                <Button onClick={() => setHidden(!hidden)} title="Show/Hide">
                     {hidden ? (
                         <i className="fa-solid fa-chevron-up" />
                     ) : (
@@ -176,19 +179,30 @@ export default function YouTubePlayer({
                         onChange={handleSeekChange}
                         onPointerUp={handleSeekCommit}
                         onTouchEnd={handleSeekCommit}
+                        title="Timeline"
                     />
                     <span>{formatTime(videoLength)}</span>
+                    <Button title="Repeat">
+                        <i className="fa-solid fa-repeat"></i>
+                    </Button>
                 </div>
             </div>
             <div className={classes.controls}>
-                <Button onClick={toggleVideo}>
+                <Button title="Previous">
+                    <i className="fa-solid fa-backward-step"></i>
+                </Button>
+                <Button onClick={toggleVideo} title="Start/Pause">
                     {isPlaying ? (
                         <i className="fa-solid fa-pause" />
                     ) : (
                         <i className="fa-solid fa-play"></i>
                     )}
                 </Button>
+                <Button title="Next">
+                    <i className="fa-solid fa-forward-step"></i>
+                </Button>
                 <Button
+                    title="Mute/Unmute"
                     onClick={() => {
                         changeVolume(volume === 0 ? 10 : 0);
                     }}
@@ -207,6 +221,7 @@ export default function YouTubePlayer({
                     max={100}
                     value={volume}
                     onChange={(e) => changeVolume(Number(e.target.value))}
+                    title="Volume level"
                 />
             </div>
         </div>

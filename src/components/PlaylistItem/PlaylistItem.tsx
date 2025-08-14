@@ -1,4 +1,5 @@
 import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
+import Button from "../Button/Button";
 import type { PlaylistsProps } from "../MusicVideoList/MusicVideoList";
 
 export default function MusicVideoItem({
@@ -40,7 +41,9 @@ export default function MusicVideoItem({
                         <span>Published: {publishedAt}</span>
                     </div>
                     <div>
-                        <span className={generalClasses.type}>Playlist</span>
+                        <Button>
+                            Add <i className="fa-solid fa-bars-staggered" />
+                        </Button>
                     </div>
                 </div>
             </div>

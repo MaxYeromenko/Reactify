@@ -1,4 +1,5 @@
 import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
+import Button from "../Button/Button";
 import type { VideoProps } from "../MusicVideoList/MusicVideoList";
 
 export default function MusicVideoItem({
@@ -11,7 +12,15 @@ export default function MusicVideoItem({
     viewCount,
     likeCount,
     onPlayVideo,
+    idList,
+    setIdList,
 }: VideoProps) {
+    function addToQueue() {
+        if (idList && !idList.includes(id)) {
+            setIdList([...idList, id]);
+        }
+    }
+
     return (
         <div className={generalClasses.musicVideoItem}>
             <div
@@ -46,7 +55,9 @@ export default function MusicVideoItem({
                         )}
                     </div>
                     <div>
-                        <span className={generalClasses.type}>Video</span>
+                        <Button onClick={addToQueue}>
+                            Add <i className="fa-solid fa-bars-staggered" />
+                        </Button>
                     </div>
                 </div>
             </div>
