@@ -3,6 +3,7 @@ import YouTubePlayer from "../YouTubePlayer/YouTubePlayer";
 import MusicVideoList from "../MusicVideoList/MusicVideoList";
 import Button from "../Button/Button";
 import { useEffect, useState } from "react";
+import PlaybackQueue from "../PlaybackQueue/PlaybackQueue";
 
 type MainProps = {
     onPlayVideo: (query: string) => void;
@@ -60,12 +61,13 @@ export default function Main({
                     Playback queue
                 </Button>
             </div>
-            <div className={page !== "recs" ? classes.hidden : ""}>
+            <div>
                 <YouTubePlayer
                     videoId={videoId ?? undefined}
                     playlistId={playlistId ?? undefined}
                 />
                 <MusicVideoList
+                    className={page !== "recs" ? classes.hidden : ""}
                     onPlayVideo={onPlayVideo}
                     onPlayPlaylist={onPlayPlaylist}
                     region={region}
@@ -73,14 +75,16 @@ export default function Main({
                     query={query}
                     search={search}
                     setSearch={setSearch}
-                    idList={idList}
                     setIdList={setIdList}
                 />
             </div>
             <div className={page !== "pQueue" ? classes.hidden : ""}>
-                {idList.map((item) => (
-                    <p>{item}</p>
-                ))}
+                <PlaybackQueue
+                    idList={idList}
+                    onPlayVideo={onPlayVideo}
+                    onPlayPlaylist={onPlayPlaylist}
+                    setIdList={setIdList}
+                />
             </div>
         </main>
     );

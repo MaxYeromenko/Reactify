@@ -5,6 +5,7 @@ import PlaylistItem from "../PlaylistItem/PlaylistItem";
 import Button from "../Button/Button";
 
 type MusicVideoListProps = {
+    className: string;
     onPlayVideo: (query: string) => void;
     onPlayPlaylist: (query: string) => void;
     region: string;
@@ -12,8 +13,7 @@ type MusicVideoListProps = {
     query: string;
     search: boolean;
     setSearch: (search: boolean) => void;
-    idList: string[];
-    setIdList: (idList: string[]) => void;
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 export type VideoProps = {
@@ -26,8 +26,7 @@ export type VideoProps = {
     viewCount?: number;
     likeCount?: number;
     onPlayVideo: (query: string) => void;
-    idList: string[];
-    setIdList: (idList: string[]) => void;
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 type CachedVideo = {
@@ -43,6 +42,7 @@ export type PlaylistsProps = {
     itemCount?: number;
     publishedAt: string;
     onPlayPlaylist: (query: string) => void;
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 type CachedPlaylist = {
@@ -50,7 +50,7 @@ type CachedPlaylist = {
     timestamp: number;
 };
 
-type MediaType = "video" | "playlist";
+export type MediaType = "video" | "playlist";
 
 const TTL = 6 * 60 * 60 * 1000;
 
@@ -70,6 +70,7 @@ function formatDuration(isoDuration: string) {
 }
 
 export default function MusicVideoList({
+    className,
     region,
     language,
     onPlayVideo,
@@ -77,7 +78,6 @@ export default function MusicVideoList({
     query,
     search,
     setSearch,
-    idList,
     setIdList,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
@@ -319,7 +319,7 @@ export default function MusicVideoList({
     }
 
     return (
-        <>
+        <div className={className}>
             <div className={classes.divider}>
                 <h1>Videos</h1>
             </div>
@@ -338,7 +338,6 @@ export default function MusicVideoList({
                         key={video.id}
                         {...video}
                         onPlayVideo={onPlayVideo}
-                        idList={idList}
                         setIdList={setIdList}
                     />
                 ))}
@@ -362,9 +361,10 @@ export default function MusicVideoList({
                         key={playlist.id}
                         {...playlist}
                         onPlayPlaylist={onPlayPlaylist}
+                        setIdList={setIdList}
                     />
                 ))}
             </div>
-        </>
+        </div>
     );
 }

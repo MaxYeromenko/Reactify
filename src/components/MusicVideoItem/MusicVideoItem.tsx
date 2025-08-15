@@ -12,13 +12,10 @@ export default function MusicVideoItem({
     viewCount,
     likeCount,
     onPlayVideo,
-    idList,
     setIdList,
 }: VideoProps) {
     function addToQueue() {
-        if (idList && !idList.includes(id)) {
-            setIdList([...idList, id]);
-        }
+        setIdList((prev) => [...prev.filter((item) => item !== id), id]);
     }
 
     return (

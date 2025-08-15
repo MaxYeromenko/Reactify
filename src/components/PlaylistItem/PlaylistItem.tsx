@@ -10,7 +10,12 @@ export default function MusicVideoItem({
     itemCount,
     publishedAt,
     onPlayPlaylist,
+    setIdList,
 }: PlaylistsProps) {
+    function addToQueue() {
+        setIdList((prev) => [...prev.filter((item) => item !== id), id]);
+    }
+
     return (
         <div className={generalClasses.playlistItem}>
             <div
@@ -41,7 +46,7 @@ export default function MusicVideoItem({
                         <span>Published: {publishedAt}</span>
                     </div>
                     <div>
-                        <Button>
+                        <Button onClick={addToQueue}>
                             Add <i className="fa-solid fa-bars-staggered" />
                         </Button>
                     </div>

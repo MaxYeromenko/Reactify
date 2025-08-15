@@ -1,7 +1,8 @@
 @use "/src/scss/patterns" as *;
 
 .musicVideoItem,
-.playlistItem {
+.playlistItem,
+.playbackQueueItem {
     @extend %centered-flex, %rounded-all-edges;
     justify-content: flex-start;
     gap: 10px 25px;

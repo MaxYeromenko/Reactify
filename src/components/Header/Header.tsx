@@ -24,7 +24,7 @@ export default function Header({
     setLanguage,
     setSearch,
 }: HeaderProps) {
-    const regionCodes: (Region & { language: string })[] = [
+    const regionCodes: Region[] = [
         {
             value: "UA",
             content: "UA (Ukraine)",

@@ -1,11 +1,32 @@
-// import classes from "./_PlaybackQueue.module.scss";
+import PlaybackQueueItem from "../PlaybackQueueItem/PlaybackQueueItem";
+import classes from "./_PlaybackQueue.module.scss";
 
-export default function PlaybackQueue() {
+import type { HTMLAttributes } from "react";
+
+type PlaybackQueueProps = HTMLAttributes<HTMLElement> & {
+    idList: string[];
+    onPlayVideo: (query: string) => void;
+    onPlayPlaylist: (query: string) => void;
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+};
+
+export default function PlaybackQueue({
+    idList,
+    onPlayVideo,
+    onPlayPlaylist,
+    setIdList,
+}: PlaybackQueueProps) {
     return (
-        <div>
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente
-            eum, qui maiores sit non a eaque debitis porro nihil, esse iure eos
-            labore molestias provident corporis vitae nemo ipsa doloribus.
+        <div className={classes.playbackQueue}>
+            {idList.map((item) => (
+                <PlaybackQueueItem
+                    key={item}
+                    itemId={item}
+                    onPlayVideo={onPlayVideo}
+                    onPlayPlaylist={onPlayPlaylist}
+                    setIdList={setIdList}
+                />
+            ))}
         </div>
     );
 }
