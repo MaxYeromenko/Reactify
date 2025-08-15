@@ -25,9 +25,11 @@ function formatTime(seconds: number) {
 export default function YouTubePlayer({
     videoId,
     playlistId,
+    setIdList,
 }: {
     videoId?: string | null;
     playlistId?: string | null;
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
     const playerRef = useRef<YT.Player | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
@@ -36,9 +38,6 @@ export default function YouTubePlayer({
     const [currentTime, setCurrentTime] = useState(0);
     const [videoLength, setVideoLength] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
-    const [previousId, setPreviousId] = useState("");
-    const [nextId, setNextId] = useState("");
-    const [isCycled, setIsCycled] = useState(false);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -74,6 +73,10 @@ export default function YouTubePlayer({
                         }
                     },
                     onStateChange: (event: any) => {
+                        if (event.data === window.YT.PlayerState.ENDED) {
+                            playNextFromQueue();
+                            return;
+                        }
                         const v = event.data === window.YT.PlayerState.PLAYING;
                         setIsPlaying(v);
                         if (v) {
@@ -81,6 +84,9 @@ export default function YouTubePlayer({
                                 playerRef.current?.getDuration() || 0
                             );
                         }
+                    },
+                    onError: () => {
+                        playNextFromQueue();
                     },
                 },
             });
@@ -146,6 +152,60 @@ export default function YouTubePlayer({
         playerRef.current?.setVolume(v);
     };
 
+    function playFromQueue(offset: number) {
+        if (!playerRef.current) return;
+
+        const playlist = playerRef.current.getPlaylist();
+        const isPlaylist = !!playlist && playlist.length > 0;
+
+        if (isPlaylist) {
+            const currentIndex = playerRef.current.getPlaylistIndex();
+            const newIndex =
+                (currentIndex + offset + playlist.length) % playlist.length;
+            playerRef.current.playVideoAt(newIndex);
+        } else {
+            const currentId = playerRef.current.getVideoData().video_id;
+
+            setIdList((prev) => {
+                let newList = prev.includes(currentId)
+                    ? [...prev]
+                    : [...prev, currentId];
+                const currentIndex = newList.indexOf(currentId);
+                const newIndex =
+                    (currentIndex + offset + newList.length) % newList.length;
+                const id = newList[newIndex];
+
+                const videoCache = JSON.parse(
+                    localStorage.getItem("youtubeVideoCache") || "{}"
+                );
+                const playlistCache = JSON.parse(
+                    localStorage.getItem("youtubeVideoCache_playlists") || "{}"
+                );
+
+                if (videoCache[id]) {
+                    playerRef.current?.loadVideoById(videoCache[id].data.id);
+                } else if (playlistCache[id]) {
+                    playerRef.current?.loadPlaylist({
+                        listType: "playlist",
+                        list: playlistCache[id].data.id,
+                    });
+                } else {
+                    playerRef.current?.loadVideoById(id);
+                }
+
+                return newList;
+            });
+        }
+    }
+
+    function playNextFromQueue() {
+        playFromQueue(1);
+    }
+
+    function playPreviousFromQueue() {
+        playFromQueue(-1);
+    }
+
     return (
         <div
             className={
@@ -188,7 +248,7 @@ export default function YouTubePlayer({
                 </div>
             </div>
             <div className={classes.controls}>
-                <Button title="Previous">
+                <Button title="Previous" onClick={playPreviousFromQueue}>
                     <i className="fa-solid fa-backward-step"></i>
                 </Button>
                 <Button onClick={toggleVideo} title="Start/Pause">
@@ -198,7 +258,7 @@ export default function YouTubePlayer({
                         <i className="fa-solid fa-play"></i>
                     )}
                 </Button>
-                <Button title="Next">
+                <Button title="Next" onClick={playNextFromQueue}>
                     <i className="fa-solid fa-forward-step"></i>
                 </Button>
                 <Button

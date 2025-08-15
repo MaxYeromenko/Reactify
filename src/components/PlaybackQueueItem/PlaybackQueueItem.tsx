@@ -27,9 +27,7 @@ export default function PlaybackQueueItem({
         try {
             if (videoCache) parsedVideoCache = JSON.parse(videoCache);
             if (playlistCache) parsedPlaylistCache = JSON.parse(playlistCache);
-        } catch (err) {
-            console.error("Ошибка парсинга кеша:", err);
-        }
+        } catch {}
 
         if (parsedVideoCache[id]) {
             mediaType = "video";

@@ -34,9 +34,7 @@ export default function Main({
         if (saved) {
             try {
                 return JSON.parse(saved);
-            } catch {
-                console.error("Ошибка парсинга idList из localStorage");
-            }
+            } catch {}
         }
         return [];
     });
@@ -65,6 +63,7 @@ export default function Main({
                 <YouTubePlayer
                     videoId={videoId ?? undefined}
                     playlistId={playlistId ?? undefined}
+                    setIdList={setIdList}
                 />
                 <MusicVideoList
                     className={page !== "recs" ? classes.hidden : ""}
