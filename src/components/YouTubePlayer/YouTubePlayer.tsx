@@ -45,6 +45,11 @@ export default function YouTubePlayer({
     const [videoLength, setVideoLength] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
     const currentId = useRef<string | null>(null);
+    const [isCycled, setIsCycled] = useState(() => {
+        const stored = localStorage.getItem("isCycled");
+        return stored === "true";
+    });
+    const isCycledRef = useRef(isCycled);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -64,24 +69,31 @@ export default function YouTubePlayer({
                 },
                 events: {
                     onReady: () => {
-                        if (playerRef.current) {
-                            playerRef.current.setVolume(volume);
-                            setVideoLength(playerRef.current.getDuration());
+                        const player = playerRef.current;
+                        if (!player) return;
+
+                        if (player) {
+                            player.setVolume(volume);
+                            setVideoLength(player.getDuration());
                         }
                     },
                     onStateChange: (event: any) => {
-                        if (event.data === window.YT.PlayerState.ENDED) {
-                            playNextFromQueue();
-                        }
+                        const player = playerRef.current;
+                        if (!player) return;
                         if (event.data === window.YT.PlayerState.PLAYING) {
                             setIsPlaying(true);
-                            setVideoLength(
-                                playerRef.current?.getDuration() || 0
-                            );
+                            setVideoLength(player.getDuration() || 0);
+                        }
+
+                        if (event.data === window.YT.PlayerState.ENDED) {
+                            checkIfCycled(player);
                         }
                     },
                     onError: () => {
-                        playNextFromQueue();
+                        const player = playerRef.current;
+                        if (!player) return;
+
+                        checkIfCycled(player, true);
                     },
                 },
             };
@@ -152,6 +164,10 @@ export default function YouTubePlayer({
         }
     }, [isSeeking]);
 
+    useEffect(() => {
+        localStorage.setItem("isCycled", isCycled.toString());
+    }, [isCycled]);
+
     function handleSeekChange(e: React.ChangeEvent<HTMLInputElement>) {
         setCurrentTime(Number(e.target.value));
         setIsSeeking(true);
@@ -167,7 +183,15 @@ export default function YouTubePlayer({
     function toggleVideo() {
         if (isPlaying) playerRef.current?.pauseVideo();
         else playerRef.current?.playVideo();
-        setIsPlaying(!isPlaying);
+        setIsPlaying((prev) => !prev);
+    }
+
+    function toggleCycled() {
+        setIsCycled((prev) => {
+            const newValue = !prev;
+            isCycledRef.current = newValue;
+            return newValue;
+        });
     }
 
     const changeVolume = (v: number) => {
@@ -237,6 +261,40 @@ export default function YouTubePlayer({
         playFromQueue(-1);
     }
 
+    function skipPlaylist(offset: number) {
+        if (currentId.current) {
+            const idx = idList.indexOf(currentId.current);
+            const nextId =
+                idList[(idx + offset + idList.length) % idList.length];
+            playMediaById(nextId);
+        }
+    }
+
+    function skipPlaylistForward() {
+        skipPlaylist(1);
+    }
+
+    function skipPlaylistBackward() {
+        skipPlaylist(-1);
+    }
+
+    function checkIfCycled(player: YT.Player, errorHandle: boolean = false) {
+        const playlist = player.getPlaylist() || [];
+        const currentIndex = player.getPlaylistIndex?.() ?? 0;
+
+        if (playlist.length > 0 && isCycledRef.current) {
+            if (currentIndex === playlist.length - 1) player.playVideoAt(0);
+            else if (errorHandle) {
+                playNextFromQueue();
+            }
+        } else if (isCycledRef.current) {
+            player.seekTo(0, true);
+            player.playVideo();
+        } else {
+            playNextFromQueue();
+        }
+    }
+
     return (
         <div
             className={
@@ -273,13 +331,21 @@ export default function YouTubePlayer({
                         title="Timeline"
                     />
                     <span>{formatTime(videoLength)}</span>
-                    <Button title="Repeat">
+                    <Button
+                        title="Repeat"
+                        active={isCycled}
+                        onClick={toggleCycled}
+                    >
                         <i className="fa-solid fa-repeat"></i>
                     </Button>
                 </div>
             </div>
             <div className={classes.controls}>
-                <Button title="Previous" onClick={playPreviousFromQueue}>
+                <Button
+                    title="Previous"
+                    onClick={playPreviousFromQueue}
+                    onDoubleClick={skipPlaylistBackward}
+                >
                     <i className="fa-solid fa-backward-step"></i>
                 </Button>
                 <Button onClick={toggleVideo} title="Start/Pause">
@@ -289,7 +355,11 @@ export default function YouTubePlayer({
                         <i className="fa-solid fa-play"></i>
                     )}
                 </Button>
-                <Button title="Next" onClick={playNextFromQueue}>
+                <Button
+                    title="Next"
+                    onClick={playNextFromQueue}
+                    onDoubleClick={skipPlaylistForward}
+                >
                     <i className="fa-solid fa-forward-step"></i>
                 </Button>
                 <Button

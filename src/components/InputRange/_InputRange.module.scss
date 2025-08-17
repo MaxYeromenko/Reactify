@@ -12,6 +12,7 @@
         height: 8px;
         background: var(--text-color);
         border-radius: $round-edges;
+        overflow: hidden;
     }
 
     &::-webkit-slider-thumb {
@@ -29,6 +30,7 @@
         height: 8px;
         background: var(--text-color);
         border-radius: $round-edges;
+        overflow: hidden;
     }
 
     &::-moz-range-thumb {
