@@ -9,7 +9,9 @@ type MainProps = {
     onPlayVideo: (query: string) => void;
     onPlayPlaylist: (id: string) => void;
     videoId: string | null;
+    setVideoId: (id: string | null) => void;
     playlistId: string | null;
+    setPlaylistId: (id: string | null) => void;
     region: string;
     language: string;
     query: string;
@@ -19,7 +21,9 @@ type MainProps = {
 
 export default function Main({
     videoId,
+    setVideoId,
     playlistId,
+    setPlaylistId,
     region,
     language,
     onPlayVideo,
@@ -62,7 +66,10 @@ export default function Main({
             <div>
                 <YouTubePlayer
                     videoId={videoId ?? undefined}
+                    setVideoId={setVideoId}
                     playlistId={playlistId ?? undefined}
+                    setPlaylistId={setPlaylistId}
+                    idList={idList}
                     setIdList={setIdList}
                 />
                 <MusicVideoList

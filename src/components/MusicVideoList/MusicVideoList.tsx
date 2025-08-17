@@ -50,7 +50,7 @@ type CachedPlaylist = {
     timestamp: number;
 };
 
-export type MediaType = "video" | "playlist";
+export type MediaType = "video" | "playlist" | "video,playlist";
 
 const TTL = 6 * 60 * 60 * 1000;
 
@@ -67,6 +67,37 @@ function formatDuration(isoDuration: string) {
     ]
         .filter(Boolean)
         .join(":");
+}
+
+const apiKeyFirst = import.meta.env.VITE_YOUTUBE_API_KEY;
+const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
+
+async function fetchWithFallback(urlFirst: string, urlSecond: string) {
+    for (const url of [urlFirst, urlSecond]) {
+        try {
+            const res = await fetch(url);
+            if (res.ok) return await res.json();
+        } catch {}
+    }
+    return null;
+}
+
+export async function fetchMediaByIds(
+    ids: string[],
+    type: MediaType = "video,playlist"
+) {
+    const URL_PATTERN = "https://www.googleapis.com/youtube/v3/";
+    const makeUrl = (apiKey: string) =>
+        type === "video"
+            ? `${URL_PATTERN}videos?part=snippet,
+                contentDetails,statistics&id=${ids.join(",")}&key=${apiKey}`
+            : `${URL_PATTERN}playlists?part=snippet,
+                contentDetails&id=${ids.join(",")}&key=${apiKey}`;
+    const data = await fetchWithFallback(
+        makeUrl(apiKeyFirst),
+        makeUrl(apiKeySecond)
+    );
+    return data ?? { items: [] };
 }
 
 export default function MusicVideoList({
@@ -90,34 +121,6 @@ export default function MusicVideoList({
 
     const [playlists, setPlaylists] = useState<PlaylistsProps[]>([]);
     const playlistsCacheRef = useRef<Record<string, CachedPlaylist>>({});
-
-    const apiKeyFirst = import.meta.env.VITE_YOUTUBE_API_KEY;
-    const apiKeySecond = import.meta.env.VITE_YOUTUBE_API_KEY_SECOND;
-
-    async function fetchWithFallback(urlFirst: string, urlSecond: string) {
-        for (const url of [urlFirst, urlSecond]) {
-            try {
-                const res = await fetch(url);
-                if (res.ok) return await res.json();
-            } catch {}
-        }
-        return null;
-    }
-
-    async function fetchMediaByIds(ids: string[], type: MediaType) {
-        const URL_PATTERN = "https://www.googleapis.com/youtube/v3/";
-        const makeUrl = (apiKey: string) =>
-            type === "video"
-                ? `${URL_PATTERN}videos?part=snippet,
-                contentDetails,statistics&id=${ids.join(",")}&key=${apiKey}`
-                : `${URL_PATTERN}playlists?part=snippet,
-                contentDetails&id=${ids.join(",")}&key=${apiKey}`;
-        const data = await fetchWithFallback(
-            makeUrl(apiKeyFirst),
-            makeUrl(apiKeySecond)
-        );
-        return data ?? { items: [] };
-    }
 
     async function fetchMediaIds(vCount: number, pCount: number) {
         const now = Date.now();

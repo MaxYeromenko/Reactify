@@ -24,11 +24,17 @@ function formatTime(seconds: number) {
 
 export default function YouTubePlayer({
     videoId,
+    setVideoId,
     playlistId,
+    setPlaylistId,
+    idList,
     setIdList,
 }: {
     videoId?: string | null;
+    setVideoId: (id: string | null) => void;
     playlistId?: string | null;
+    setPlaylistId: (id: string | null) => void;
+    idList: string[];
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
     const playerRef = useRef<YT.Player | null>(null);
@@ -38,6 +44,7 @@ export default function YouTubePlayer({
     const [currentTime, setCurrentTime] = useState(0);
     const [videoLength, setVideoLength] = useState(0);
     const [isSeeking, setIsSeeking] = useState(false);
+    const currentId = useRef<string | null>(null);
 
     useEffect(() => {
         const tag = document.createElement("script");
@@ -46,25 +53,15 @@ export default function YouTubePlayer({
 
         window.onYouTubeIframeAPIReady = () => {
             if (!videoId && !playlistId) return;
-            playerRef.current = new window.YT.Player("yt-player", {
-                videoId: playlistId ? undefined : (videoId as string),
-                playerVars: playlistId
-                    ? {
-                          listType: "playlist",
-                          list: playlistId as string,
-                          controls: 0,
-                          modestbranding: 1,
-                          rel: 0,
-                          disablekb: 1,
-                          autoplay: 0,
-                      }
-                    : {
-                          controls: 0,
-                          modestbranding: 1,
-                          rel: 0,
-                          disablekb: 1,
-                          autoplay: 0,
-                      },
+
+            const options: YT.PlayerOptions = {
+                playerVars: {
+                    controls: 0,
+                    modestbranding: 1,
+                    rel: 0,
+                    disablekb: 1,
+                    autoplay: 0,
+                },
                 events: {
                     onReady: () => {
                         if (playerRef.current) {
@@ -75,11 +72,9 @@ export default function YouTubePlayer({
                     onStateChange: (event: any) => {
                         if (event.data === window.YT.PlayerState.ENDED) {
                             playNextFromQueue();
-                            return;
                         }
-                        const v = event.data === window.YT.PlayerState.PLAYING;
-                        setIsPlaying(v);
-                        if (v) {
+                        if (event.data === window.YT.PlayerState.PLAYING) {
+                            setIsPlaying(true);
                             setVideoLength(
                                 playerRef.current?.getDuration() || 0
                             );
@@ -89,7 +84,25 @@ export default function YouTubePlayer({
                         playNextFromQueue();
                     },
                 },
-            });
+            };
+
+            if (playlistId) {
+                currentId.current = playlistId;
+                (options.playerVars as any).listType = "playlist";
+                (options.playerVars as any).list = playlistId;
+                (options.playerVars as any).index = 0;
+                playerRef.current = new (window as any).YT.Player(
+                    "yt-player",
+                    options
+                );
+            } else if (videoId) {
+                currentId.current = videoId;
+                options.videoId = videoId;
+                playerRef.current = new (window as any).YT.Player(
+                    "yt-player",
+                    options
+                );
+            }
         };
 
         return () => {
@@ -101,11 +114,13 @@ export default function YouTubePlayer({
         if (playerRef.current) {
             playerRef.current.stopVideo();
             if (playlistId) {
+                currentId.current = playlistId;
                 playerRef.current.loadPlaylist({
                     listType: "playlist",
                     list: playlistId,
                 });
             } else if (videoId) {
+                currentId.current = videoId;
                 playerRef.current.loadVideoById(videoId);
             }
             playerRef.current.setVolume(volume);
@@ -128,6 +143,14 @@ export default function YouTubePlayer({
             if (intervalId) clearInterval(intervalId);
         };
     }, [isPlaying, isSeeking]);
+
+    useEffect(() => {
+        if (isSeeking) {
+            playerRef.current?.pauseVideo();
+        } else {
+            playerRef.current?.playVideo();
+        }
+    }, [isSeeking]);
 
     function handleSeekChange(e: React.ChangeEvent<HTMLInputElement>) {
         setCurrentTime(Number(e.target.value));
@@ -152,6 +175,27 @@ export default function YouTubePlayer({
         playerRef.current?.setVolume(v);
     };
 
+    function playMediaById(id: string) {
+        currentId.current = id;
+        const videoCache = JSON.parse(
+            localStorage.getItem("youtubeVideoCache") || "{}"
+        );
+        const playlistCache = JSON.parse(
+            localStorage.getItem("youtubeVideoCache_playlists") || "{}"
+        );
+
+        if (videoCache[id]) {
+            setPlaylistId(null);
+            setVideoId(id);
+        } else if (playlistCache[id]) {
+            setVideoId(null);
+            setPlaylistId(id);
+        } else {
+            setPlaylistId(null);
+            setVideoId(id);
+        }
+    }
+
     function playFromQueue(offset: number) {
         if (!playerRef.current) return;
 
@@ -160,39 +204,26 @@ export default function YouTubePlayer({
 
         if (isPlaylist) {
             const currentIndex = playerRef.current.getPlaylistIndex();
-            const newIndex =
-                (currentIndex + offset + playlist.length) % playlist.length;
-            playerRef.current.playVideoAt(newIndex);
+            const newIndex = currentIndex + offset;
+            if (newIndex >= 0 && newIndex < playlist.length) {
+                playerRef.current.playVideoAt(newIndex);
+            } else if (currentId.current) {
+                const idx = idList.indexOf(currentId.current);
+                const nextId =
+                    idList[(idx + offset + idList.length) % idList.length];
+                playMediaById(nextId);
+            }
         } else {
-            const currentId = playerRef.current.getVideoData().video_id;
+            const currentVideoId = playerRef.current.getVideoData().video_id;
 
             setIdList((prev) => {
-                let newList = prev.includes(currentId)
+                let newList = prev.includes(currentVideoId)
                     ? [...prev]
-                    : [...prev, currentId];
-                const currentIndex = newList.indexOf(currentId);
+                    : [...prev, currentVideoId];
+                const currentIndex = newList.indexOf(currentVideoId);
                 const newIndex =
                     (currentIndex + offset + newList.length) % newList.length;
-                const id = newList[newIndex];
-
-                const videoCache = JSON.parse(
-                    localStorage.getItem("youtubeVideoCache") || "{}"
-                );
-                const playlistCache = JSON.parse(
-                    localStorage.getItem("youtubeVideoCache_playlists") || "{}"
-                );
-
-                if (videoCache[id]) {
-                    playerRef.current?.loadVideoById(videoCache[id].data.id);
-                } else if (playlistCache[id]) {
-                    playerRef.current?.loadPlaylist({
-                        listType: "playlist",
-                        list: playlistCache[id].data.id,
-                    });
-                } else {
-                    playerRef.current?.loadVideoById(id);
-                }
-
+                playMediaById(newList[newIndex]);
                 return newList;
             });
         }

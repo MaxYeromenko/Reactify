@@ -1,6 +1,6 @@
 import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
 import Button from "../Button/Button";
-import type { MediaType } from "../MusicVideoList/MusicVideoList";
+import { type MediaType } from "../MusicVideoList/MusicVideoList";
 
 export default function PlaybackQueueItem({
     itemId,
