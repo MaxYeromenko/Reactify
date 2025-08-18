@@ -3,6 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import MusicVideoItem from "../MusicVideoItem/MusicVideoItem";
 import PlaylistItem from "../PlaylistItem/PlaylistItem";
 import Button from "../Button/Button";
+import type { MessageType } from "../ToastMessage/ToastMessage";
 
 type MusicVideoListProps = {
     className: string;
@@ -14,6 +15,8 @@ type MusicVideoListProps = {
     search: boolean;
     setSearch: (search: boolean) => void;
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+    setMessage: (message: string) => void;
+    setMessageType: (messageType: MessageType) => void;
 };
 
 export type VideoProps = {
@@ -27,6 +30,8 @@ export type VideoProps = {
     likeCount?: number;
     onPlayVideo: (query: string) => void;
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+    setMessage: (message: string) => void;
+    setMessageType: (messageType: MessageType) => void;
 };
 
 type CachedVideo = {
@@ -43,6 +48,8 @@ export type PlaylistsProps = {
     publishedAt: string;
     onPlayPlaylist: (query: string) => void;
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+    setMessage: (message: string) => void;
+    setMessageType: (messageType: MessageType) => void;
 };
 
 type CachedPlaylist = {
@@ -110,6 +117,8 @@ export default function MusicVideoList({
     search,
     setSearch,
     setIdList,
+    setMessage,
+    setMessageType,
 }: MusicVideoListProps) {
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
@@ -342,6 +351,8 @@ export default function MusicVideoList({
                         {...video}
                         onPlayVideo={onPlayVideo}
                         setIdList={setIdList}
+                        setMessage={setMessage}
+                        setMessageType={setMessageType}
                     />
                 ))}
             </div>
@@ -365,6 +376,8 @@ export default function MusicVideoList({
                         {...playlist}
                         onPlayPlaylist={onPlayPlaylist}
                         setIdList={setIdList}
+                        setMessage={setMessage}
+                        setMessageType={setMessageType}
                     />
                 ))}
             </div>

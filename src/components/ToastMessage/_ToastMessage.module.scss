@@ -1,0 +1,40 @@
+@use "/src/scss/patterns" as *;
+
+$info-color: #6464ff;
+$warning-color: #ebeb43;
+$error-color: #dc143c;
+
+.toastMessage {
+    @extend %centered-flex, %rounded-all-edges;
+    padding: 0.5%;
+    min-width: 50%;
+    position: fixed;
+    left: 1%;
+    bottom: 2.5%;
+    z-index: 2;
+    background-color: var(--primary-color);
+}
+
+.info {
+    outline: 0.125em solid $info-color;
+
+    span {
+        color: $info-color;
+    }
+}
+
+.warning {
+    outline: 0.125em solid $warning-color;
+
+    span {
+        color: $warning-color;
+    }
+}
+
+.error {
+    outline: 0.125em solid $error-color;
+
+    span {
+        color: $error-color;
+    }
+}

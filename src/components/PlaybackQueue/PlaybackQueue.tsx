@@ -1,4 +1,5 @@
 import PlaybackQueueItem from "../PlaybackQueueItem/PlaybackQueueItem";
+import type { MessageType } from "../ToastMessage/ToastMessage";
 import classes from "./_PlaybackQueue.module.scss";
 
 import type { HTMLAttributes } from "react";
@@ -8,6 +9,8 @@ type PlaybackQueueProps = HTMLAttributes<HTMLElement> & {
     onPlayVideo: (query: string) => void;
     onPlayPlaylist: (query: string) => void;
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+    setMessage: (message: string) => void;
+    setMessageType: (messageType: MessageType) => void;
 };
 
 export default function PlaybackQueue({
@@ -15,6 +18,8 @@ export default function PlaybackQueue({
     onPlayVideo,
     onPlayPlaylist,
     setIdList,
+    setMessage,
+    setMessageType,
 }: PlaybackQueueProps) {
     return (
         <div className={classes.playbackQueue}>
@@ -25,6 +30,8 @@ export default function PlaybackQueue({
                     onPlayVideo={onPlayVideo}
                     onPlayPlaylist={onPlayPlaylist}
                     setIdList={setIdList}
+                    setMessage={setMessage}
+                    setMessageType={setMessageType}
                 />
             ))}
         </div>

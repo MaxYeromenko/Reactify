@@ -80,11 +80,9 @@ export default function YouTubePlayer({
                     onStateChange: (event: any) => {
                         const player = playerRef.current;
                         if (!player) return;
-                        if (event.data === window.YT.PlayerState.PLAYING) {
-                            setIsPlaying(true);
-                            setVideoLength(player.getDuration() || 0);
-                        }
-
+                        setIsPlaying(
+                            event.data === window.YT.PlayerState.PLAYING
+                        );
                         if (event.data === window.YT.PlayerState.ENDED) {
                             checkIfCycled(player);
                         }
@@ -183,7 +181,6 @@ export default function YouTubePlayer({
     function toggleVideo() {
         if (isPlaying) playerRef.current?.pauseVideo();
         else playerRef.current?.playVideo();
-        setIsPlaying((prev) => !prev);
     }
 
     function toggleCycled() {
@@ -382,7 +379,7 @@ export default function YouTubePlayer({
                     max={100}
                     value={volume}
                     onChange={(e) => changeVolume(Number(e.target.value))}
-                    title="Volume level"
+                    title={`Volume level (${volume}%)`}
                 />
             </div>
         </div>

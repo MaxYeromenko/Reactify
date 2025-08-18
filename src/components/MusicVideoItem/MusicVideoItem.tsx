@@ -13,9 +13,27 @@ export default function MusicVideoItem({
     likeCount,
     onPlayVideo,
     setIdList,
+    setMessage,
+    setMessageType,
 }: VideoProps) {
     function addToQueue() {
-        setIdList((prev) => [...prev.filter((item) => item !== id), id]);
+        let isDuplicate = false;
+
+        setIdList((prev) => {
+            if (prev.includes(id)) {
+                isDuplicate = true;
+                return prev;
+            }
+            return [...prev, id];
+        });
+
+        if (isDuplicate) {
+            setMessage("The video is already in the playback queue.");
+            setMessageType("warning");
+        } else {
+            setMessage("The video has been added to the playback queue.");
+            setMessageType("info");
+        }
     }
 
     return (

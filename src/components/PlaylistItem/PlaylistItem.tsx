@@ -11,9 +11,27 @@ export default function MusicVideoItem({
     publishedAt,
     onPlayPlaylist,
     setIdList,
+    setMessage,
+    setMessageType,
 }: PlaylistsProps) {
     function addToQueue() {
-        setIdList((prev) => [...prev.filter((item) => item !== id), id]);
+        let isDuplicate = false;
+
+        setIdList((prev) => {
+            if (prev.includes(id)) {
+                isDuplicate = true;
+                return prev;
+            }
+            return [...prev, id];
+        });
+
+        if (isDuplicate) {
+            setMessage("The playlist is already in the playback queue.");
+            setMessageType("warning");
+        } else {
+            setMessage("The playlist has been added to the playback queue.");
+            setMessageType("info");
+        }
     }
 
     return (

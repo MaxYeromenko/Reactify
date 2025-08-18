@@ -4,6 +4,7 @@ import MusicVideoList from "../MusicVideoList/MusicVideoList";
 import Button from "../Button/Button";
 import { useEffect, useState } from "react";
 import PlaybackQueue from "../PlaybackQueue/PlaybackQueue";
+import ToastMessage, { type MessageType } from "../ToastMessage/ToastMessage";
 
 type MainProps = {
     onPlayVideo: (query: string) => void;
@@ -42,13 +43,31 @@ export default function Main({
         }
         return [];
     });
+    const [message, setMessage] = useState("");
+    const [messageType, setMessageType] = useState<MessageType>("info");
+    const [isActive, setIsActive] = useState(false);
 
     useEffect(() => {
         localStorage.setItem("idList", JSON.stringify(idList));
     }, [idList]);
 
+    useEffect(() => {
+        if (!message) return;
+
+        setIsActive(true);
+        const intervalId = setInterval(() => {
+            setIsActive(false);
+            setMessage("");
+        }, 3000);
+
+        return () => clearInterval(intervalId);
+    }, [message]);
+
     return (
         <main className={classes.main}>
+            <div className={isActive ? "" : classes.hidden}>
+                <ToastMessage message={message} messageType={messageType} />
+            </div>
             <div className={classes.buttonsContainer}>
                 <Button
                     active={page === "recs"}
@@ -82,6 +101,8 @@ export default function Main({
                     search={search}
                     setSearch={setSearch}
                     setIdList={setIdList}
+                    setMessage={setMessage}
+                    setMessageType={setMessageType}
                 />
             </div>
             <div className={page !== "pQueue" ? classes.hidden : ""}>
@@ -90,6 +111,8 @@ export default function Main({
                     onPlayVideo={onPlayVideo}
                     onPlayPlaylist={onPlayPlaylist}
                     setIdList={setIdList}
+                    setMessage={setMessage}
+                    setMessageType={setMessageType}
                 />
             </div>
         </main>

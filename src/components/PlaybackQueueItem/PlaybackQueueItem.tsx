@@ -1,17 +1,22 @@
 import generalClasses from "../_GeneralSCSSModules/_Playlist-Music.module.scss";
 import Button from "../Button/Button";
 import { type MediaType } from "../MusicVideoList/MusicVideoList";
+import type { MessageType } from "../ToastMessage/ToastMessage";
 
 export default function PlaybackQueueItem({
     itemId,
     onPlayVideo,
     onPlayPlaylist,
     setIdList,
+    setMessage,
+    setMessageType,
 }: {
     itemId: string;
     onPlayVideo: (query: string) => void;
     onPlayPlaylist: (query: string) => void;
     setIdList: React.Dispatch<React.SetStateAction<string[]>>;
+    setMessage: (message: string) => void;
+    setMessageType: (messageType: MessageType) => void;
 }) {
     let mediaType: MediaType;
 
@@ -48,7 +53,23 @@ export default function PlaybackQueueItem({
     }
 
     function removeFromQueue() {
-        setIdList((prev) => prev.filter((id) => id !== itemId));
+        let wasRemoved = false;
+
+        setIdList((prev) => {
+            if (prev.includes(itemId)) {
+                wasRemoved = true;
+                return prev.filter((id) => id !== itemId);
+            }
+            return prev;
+        });
+
+        if (wasRemoved) {
+            setMessage("Removed from playback queue.");
+            setMessageType("info");
+        } else {
+            setMessage("Video not found in queue!");
+            setMessageType("error");
+        }
     }
 
     return (
