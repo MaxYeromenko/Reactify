@@ -1,3 +1,4 @@
+import Button from "../Button/Button";
 import PlaybackQueueItem from "../PlaybackQueueItem/PlaybackQueueItem";
 import type { MessageType } from "../ToastMessage/ToastMessage";
 import classes from "./_PlaybackQueue.module.scss";
@@ -6,23 +7,41 @@ import type { HTMLAttributes } from "react";
 
 type PlaybackQueueProps = HTMLAttributes<HTMLElement> & {
     idList: string[];
+    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
     onPlayVideo: (query: string) => void;
     onPlayPlaylist: (query: string) => void;
-    setIdList: React.Dispatch<React.SetStateAction<string[]>>;
     setMessage: (message: string) => void;
     setMessageType: (messageType: MessageType) => void;
 };
 
 export default function PlaybackQueue({
     idList,
+    setIdList,
     onPlayVideo,
     onPlayPlaylist,
-    setIdList,
     setMessage,
     setMessageType,
 }: PlaybackQueueProps) {
+    function clearPlaybackQueue() {
+        let wasCleared = false;
+
+        if (idList.length > 0) {
+            wasCleared = true;
+            setIdList([]);
+        }
+
+        if (wasCleared) {
+            setMessage("The playback queue has been cleared.");
+            setMessageType("info");
+        } else {
+            setMessage("The playback queue is already empty.");
+            setMessageType("warning");
+        }
+    }
+
     return (
         <div className={classes.playbackQueue}>
+            <Button onClick={clearPlaybackQueue}>Clear playback queue</Button>
             {idList.map((item) => (
                 <PlaybackQueueItem
                     key={item}

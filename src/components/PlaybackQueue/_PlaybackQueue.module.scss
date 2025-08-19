@@ -6,4 +6,9 @@
     flex-direction: column;
     gap: 10px;
     padding: 1%;
+
+    &>button {
+        @extend %rounded-all-edges;
+        width: 100%;
+    }
 }
