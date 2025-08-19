@@ -123,13 +123,15 @@ export default function MusicVideoList({
     const CACHE_KEY = "youtubeVideoCache";
     const CACHE_KEY_PLAYLIST = CACHE_KEY + "_playlists";
     const CACHE_KEY_SEARCH = "youtubeSearchCache";
-    const MEDIA_COUNT = 16;
+    const MEDIA_COUNT = 64;
+    const PAGE_SIZE = 8;
 
     const [videos, setVideos] = useState<VideoProps[]>([]);
-    const videosCacheRef = useRef<Record<string, CachedVideo>>({});
-
     const [playlists, setPlaylists] = useState<PlaylistsProps[]>([]);
+    const videosCacheRef = useRef<Record<string, CachedVideo>>({});
+    const [videoPage, setVideoPage] = useState(1);
     const playlistsCacheRef = useRef<Record<string, CachedPlaylist>>({});
+    const [playlistPage, setPlaylistPage] = useState(1);
 
     async function fetchMediaIds(vCount: number, pCount: number) {
         const now = Date.now();
@@ -276,10 +278,9 @@ export default function MusicVideoList({
     useEffect(() => {
         async function init() {
             const { videoIds, playlistIds } = await fetchMediaIds(
-                Math.ceil(MEDIA_COUNT / 2),
-                Math.floor(MEDIA_COUNT / 2)
+                MEDIA_COUNT,
+                MEDIA_COUNT
             );
-
             const videosList = await fetchAndCache({
                 ids: videoIds,
                 cacheRef: videosCacheRef,
@@ -298,7 +299,6 @@ export default function MusicVideoList({
                     likeCount: Number(item.statistics.likeCount),
                 }),
             });
-
             const playlistsList = await fetchAndCache({
                 ids: playlistIds,
                 cacheRef: playlistsCacheRef,
@@ -317,6 +317,8 @@ export default function MusicVideoList({
             });
             setVideos(videosList ?? []);
             setPlaylists(playlistsList ?? []);
+            setVideoPage(1);
+            setPlaylistPage(1);
         }
         if (search) {
             init();
@@ -336,50 +338,81 @@ export default function MusicVideoList({
                 <h1>Videos</h1>
             </div>
             <div className={classes.buttonContainer}>
-                <Button onClick={inDevelopment}>
+                <Button
+                    onClick={() => setVideoPage((p) => Math.max(1, p - 1))}
+                    disabled={videoPage === 1}
+                >
                     <i className="fa-solid fa-arrow-left-long"></i>
                 </Button>
-                <span>Page: 1</span>
-                <Button onClick={inDevelopment}>
+                <span>Page: {videoPage}</span>
+                <Button
+                    onClick={() =>
+                        setVideoPage((p) =>
+                            p < Math.ceil(videos.length / PAGE_SIZE) ? p + 1 : p
+                        )
+                    }
+                    disabled={videoPage >= Math.ceil(videos.length / PAGE_SIZE)}
+                >
                     <i className="fa-solid fa-arrow-right-long"></i>
                 </Button>
             </div>
             <div className={classes.musicVideoList}>
-                {videos.map((video) => (
-                    <MusicVideoItem
-                        key={video.id}
-                        {...video}
-                        onPlayVideo={onPlayVideo}
-                        setIdList={setIdList}
-                        setMessage={setMessage}
-                        setMessageType={setMessageType}
-                    />
-                ))}
+                {videos
+                    .slice((videoPage - 1) * PAGE_SIZE, videoPage * PAGE_SIZE)
+                    .map((video) => (
+                        <MusicVideoItem
+                            key={video.id}
+                            {...video}
+                            onPlayVideo={onPlayVideo}
+                            setIdList={setIdList}
+                            setMessage={setMessage}
+                            setMessageType={setMessageType}
+                        />
+                    ))}
             </div>
 
             <div className={classes.divider}>
                 <h1>Playlists</h1>
             </div>
             <div className={classes.buttonContainer}>
-                <Button onClick={inDevelopment}>
+                <Button
+                    onClick={() => setPlaylistPage((p) => Math.max(1, p - 1))}
+                    disabled={playlistPage === 1}
+                >
                     <i className="fa-solid fa-arrow-left-long"></i>
                 </Button>
-                <span>Page: 1</span>
-                <Button onClick={inDevelopment}>
+                <span>Page: {playlistPage}</span>
+                <Button
+                    onClick={() =>
+                        setPlaylistPage((p) =>
+                            p < Math.ceil(playlists.length / PAGE_SIZE)
+                                ? p + 1
+                                : p
+                        )
+                    }
+                    disabled={
+                        playlistPage >= Math.ceil(playlists.length / PAGE_SIZE)
+                    }
+                >
                     <i className="fa-solid fa-arrow-right-long"></i>
                 </Button>
             </div>
             <div className={classes.playlistList}>
-                {playlists.map((playlist) => (
-                    <PlaylistItem
-                        key={playlist.id}
-                        {...playlist}
-                        onPlayPlaylist={onPlayPlaylist}
-                        setIdList={setIdList}
-                        setMessage={setMessage}
-                        setMessageType={setMessageType}
-                    />
-                ))}
+                {playlists
+                    .slice(
+                        (playlistPage - 1) * PAGE_SIZE,
+                        playlistPage * PAGE_SIZE
+                    )
+                    .map((playlist) => (
+                        <PlaylistItem
+                            key={playlist.id}
+                            {...playlist}
+                            onPlayPlaylist={onPlayPlaylist}
+                            setIdList={setIdList}
+                            setMessage={setMessage}
+                            setMessageType={setMessageType}
+                        />
+                    ))}
             </div>
         </div>
     );
