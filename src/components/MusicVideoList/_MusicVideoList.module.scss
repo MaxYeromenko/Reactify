@@ -44,3 +44,10 @@
         max-width: 15%;
     }
 }
+
+@media (max-width:415px) {
+    .buttonContainer span {
+        max-width: 25%;
+    }
+
+}
