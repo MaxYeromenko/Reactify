@@ -39,7 +39,11 @@ export default function YouTubePlayer({
 }) {
     const playerRef = useRef<YT.Player | null>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [volume, setVolume] = useState(10);
+    const [volume, setVolume] = useState<number>(() => {
+        const stored = localStorage.getItem("volumeLevel");
+        if (stored) return Number.parseInt(stored);
+        return 10;
+    });
     const [hidden, setHidden] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [videoLength, setVideoLength] = useState(0);
@@ -57,7 +61,28 @@ export default function YouTubePlayer({
         document.body.appendChild(tag);
 
         window.onYouTubeIframeAPIReady = () => {
-            if (!videoId && !playlistId) return;
+            let initialVideoId = videoId;
+            let initialPlaylistId = playlistId;
+
+            const storedId = localStorage.getItem("ytCurrentId");
+            if (storedId) {
+                const videoCache = JSON.parse(
+                    localStorage.getItem("youtubeVideoCache") || "{}"
+                );
+                const playlistCache = JSON.parse(
+                    localStorage.getItem("youtubeVideoCache_playlists") || "{}"
+                );
+                if (videoCache[storedId]) {
+                    initialVideoId = storedId;
+                    initialPlaylistId = null;
+                } else if (playlistCache[storedId]) {
+                    initialPlaylistId = storedId;
+                    initialVideoId = null;
+                } else {
+                    initialVideoId = storedId;
+                    initialPlaylistId = null;
+                }
+            }
 
             const options: YT.PlayerOptions = {
                 playerVars: {
@@ -96,18 +121,18 @@ export default function YouTubePlayer({
                 },
             };
 
-            if (playlistId) {
-                currentId.current = playlistId;
+            if (initialPlaylistId) {
+                currentId.current = initialPlaylistId;
                 (options.playerVars as any).listType = "playlist";
-                (options.playerVars as any).list = playlistId;
+                (options.playerVars as any).list = initialPlaylistId;
                 (options.playerVars as any).index = 0;
                 playerRef.current = new (window as any).YT.Player(
                     "yt-player",
                     options
                 );
-            } else if (videoId) {
-                currentId.current = videoId;
-                options.videoId = videoId;
+            } else if (initialVideoId) {
+                currentId.current = initialVideoId;
+                options.videoId = initialVideoId;
                 playerRef.current = new (window as any).YT.Player(
                     "yt-player",
                     options
@@ -119,6 +144,12 @@ export default function YouTubePlayer({
             playerRef.current?.destroy();
         };
     }, []);
+
+    useEffect(() => {
+        if (idList.length === 0) {
+            localStorage.removeItem("ytCurrentId");
+        }
+    }, [idList]);
 
     useEffect(() => {
         if (playerRef.current) {
@@ -134,6 +165,10 @@ export default function YouTubePlayer({
                 playerRef.current.loadVideoById(videoId);
             }
             playerRef.current.setVolume(volume);
+        }
+
+        if (currentId.current) {
+            localStorage.setItem("ytCurrentId", currentId.current);
         }
     }, [videoId, playlistId]);
 
@@ -161,6 +196,10 @@ export default function YouTubePlayer({
             playerRef.current?.playVideo();
         }
     }, [isSeeking]);
+
+    useEffect(() => {
+        localStorage.setItem("volumeLevel", volume.toString());
+    }, [volume]);
 
     useEffect(() => {
         localStorage.setItem("isCycled", isCycled.toString());
