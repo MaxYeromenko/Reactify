@@ -68,7 +68,7 @@ export default function PlaybackQueueItem({
             setMessageType("info");
         } else {
             setMessage("Video not found in queue!");
-            setMessageType("error");
+            setMessageType("warning");
         }
     }
 
