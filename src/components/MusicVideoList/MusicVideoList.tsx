@@ -328,10 +328,6 @@ export default function MusicVideoList({
         }
     }, [region, search]);
 
-    function inDevelopment() {
-        alert("Functionality is under development.");
-    }
-
     return (
         <div className={className}>
             <div className={classes.divider}>
