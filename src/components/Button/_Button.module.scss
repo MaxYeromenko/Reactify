@@ -16,6 +16,15 @@
     &:active {
         background-color: var(--quaternary-color);
     }
+
+    &:disabled {
+        color: var(--text-color);
+        background-color: var(--quinary-color);
+
+        i {
+            color: var(--text-color);
+        }
+    }
 }
 
 .active {

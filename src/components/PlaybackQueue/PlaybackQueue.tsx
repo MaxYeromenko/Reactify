@@ -41,7 +41,9 @@ export default function PlaybackQueue({
 
     return (
         <div className={classes.playbackQueue}>
-            <Button onClick={clearPlaybackQueue}>Clear playback queue</Button>
+            <Button onClick={clearPlaybackQueue} disabled={idList.length === 0}>
+                Clear playback queue
+            </Button>
             {idList.map((item) => (
                 <PlaybackQueueItem
                     key={item}
